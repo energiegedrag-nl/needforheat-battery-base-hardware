@@ -89,8 +89,12 @@ The P1-BASE (60/120 mA), the BatteryBASE (60 mA) and the CoreInk's own charger o
 
 * AAA cells are 10.5 mm in diameter and 44.5 mm long: three side by side take ≈ 32 × 45 mm, inside 40 × 56 mm.
 * Cells replaceable from the back; spring contacts or a 3 × AAA holder (to select from the JLCPCB library).
-* Connector to the stack: a plain 2 × 8 male header (end item). Directly on the CoreInk it must reach 5–8 mm into the
-  8 mm deep, flush CoreInk socket; behind a P1-BASE it plugs into the P1-BASE's stacking header.
+* Connector to the stack: a plain 2 × 8 male header with 6 mm pins (end item). The P1-BASE v3 repeats the CoreInk's
+  back (a raised socket flush with its lid, LEGO holes at the same positions), so the same BatteryBASE fits directly
+  on a CoreInk and behind a P1-BASE.
+* Four LEGO posts underneath, at the CoreInk's LEGO holes (through holes; a LEGO Technic pin fits), 7 mm long:
+  they engage before the 6 mm pins and protect them in transport; three crush ribs for light friction, a flared root
+  against breaking off. Same design as `enclosure/kuip.py` of the P1-BASE v3.
 * Enclosure generated with CadQuery, reusing `enclosure/kuip.py` of the P1-BASE v3 (corner nocks in the LEGO holes,
   PCB pegs, magnets optional).
 
