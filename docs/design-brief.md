@@ -66,9 +66,13 @@ The BatteryBASE must not use the pins of the P1-BASE v3 (G13, G14, G25, G26, G34
 | Pin | Use |
 |---|---|
 | `BAT`, `GND` | charge current into the CoreInk battery |
-| `G21`/`G22` (I²C) | detection and measurement: an I²C device with a fixed address on the CoreInk's internal I²C bus (shared with the RTC) |
-| one free GPIO (e.g. `G18` or `G23`) | charger on/off |
+| `G21`/`G22` (I²C) | detection, measurement **and** charger on/off: I²C device(s) with a fixed address on the CoreInk's internal I²C bus |
 | `5V_IN`, `5V_OUT`, `3V3` | not used |
+
+There is **no free plain GPIO** on the bus: `G18`/`G23` are the CoreInk's e-paper SPI lines (found while designing the
+P1-BASE v3 LED dimmer). The charger switch is therefore driven from an I²C part (a GPIO of the ADC/monitor, or a small
+I/O expander). Addresses already in use on `G21`/`G22`: **0x51** (CoreInk RTC BM8563) and **0x62** (PCA9633DP1 LED
+driver of the P1-BASE v3; also check its all-call address in the datasheet). The BatteryBASE address must differ.
 
 The CoreInk's free ADC1 pins are taken by the P1-BASE, so the cell voltage is measured on the BatteryBASE (I²C ADC or
 a current/voltage monitor), which also gives the firmware a way to recognise the BASE by its I²C address.
@@ -120,3 +124,35 @@ From [needforheat-p1-base-hardware](https://github.com/energiegedrag-nl/needforh
 charger circuit with soft start (§ 4.5 of its design document), schematic generator with netlist self-check,
 PCB generator with autorouting, the independent checks (`tools/checks/`), the enclosure generator and the CoreInk
 measurements (outline, MI-BUS position, socket depth).
+
+## 7. Lessons from the P1-BASE v3 prototype (November 2026)
+
+Electrical:
+
+* **The CoreInk is powered off completely between tasks.** The NeedForHeat firmware switches the CoreInk off and
+  wakes it with the RTC alarm. Anything that must keep its state while the CoreInk is off (here: the charger switch and
+  the I²C device that holds it) must be powered from the BatteryBASE's own side (the cells), not from the CoreInk's
+  `3V3`. Decide what the charger does by default when nobody has told it anything (power-up, CoreInk off).
+* **No back-feeding into a switched-off CoreInk:** no signal on the bus may drive a CoreInk pin high while the CoreInk
+  is unpowered (the P1-BASE v3 needed a buffer powered from the CoreInk's `3V3` for this).
+* Simulate with ngspice before ordering (charger soft start, I²C levels, quiescent current); the P1-BASE simulations are
+  in its `tools/sim/` and `docs/simulation/`. State in the results which source and load models were used.
+
+Parts and ordering (JLCPCB):
+
+* **Use only parts that JLCPCB has in stock.** A pre-order part (the P1-BASE v3's Samtec stacking header) blocks the
+  assembly order until it arrives; JLCPCB also only places what is in stock. Check the 2 × 8 male header, the cell
+  clips or holder, the boost/charger IC and the I²C part for stock.
+* Every extended part adds a one-off loading fee per order (≈ € 2.80); prefer basic parts.
+* JLCPCB's library often has pin 1 or the zero orientation differently from KiCad. Check every part in the JLCPCB
+  placement preview (2D/3D, on the "Component Placements" tab) and keep corrections in the CPL export
+  (`JLC_CORR` in the P1-BASE's `tools/export_fab.py`). Polarised parts (diodes, LEDs, cell clips!) deserve extra care.
+* THT parts (header, clips) are soldered by JLCPCB at a small hand-soldering fee; the user does no soldering.
+
+Layout tooling:
+
+* Freerouting needs ≈ 5 GB of free memory and 20–30 minutes; its result differs between runs.
+* After routing: `pcb_cleanup.py`, DRC with zone refill and schematic parity, then `pcb_bridge_gnd.py` for GND islands.
+  A GND pin boxed in by tracks on both layers needs a hand fix; record it in the design document, because the
+  generator does not reproduce it.
+* LCSC 3D models fetched with easyeda2kicad are not committed (license unclear); approximate models are generated.
