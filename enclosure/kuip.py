@@ -63,6 +63,11 @@ GROOVE_D = 0.55
 LID_T = 1.4
 CELL_TOP = GAP + PCB_T + CELL_LIFT + AAA_D
 Z_TOP = CELL_TOP + 0.6  # lid underside: 0.6 mm above the cells; ribs under the lid close the gap to 0.2 mm
+# shipping: each module goes loose (not stacked) in a letterbox parcel (PostNL brievenbuspakje, max. 32 mm thick);
+# 27 mm leaves ≥ 5 mm for the box and padding. Thickness = lid top to the tips of the LEGO posts.
+SHIP_MAX = 27.0
+SHIP_T = Z_TOP + LID_T + POST_L
+assert SHIP_T <= SHIP_MAX, f"BatteryBASE is {SHIP_T:.1f} mm thick, more than {SHIP_MAX} mm for a letterbox parcel"
 
 
 def slab(w, h, r, z0, z1, off=0.0):
@@ -181,6 +186,7 @@ def main():
     asm.add(hdr, name="header", color=cq.Color(0.1, 0.1, 0.1))
     asm.save(os.path.join(OUT, "battery-base-fit.step"), exportType="STEP")
     print("wrote battery-base-fit")
+    print(f"thickness for shipping (lid top to post tips): {SHIP_T:.1f} mm (max. {SHIP_MAX} mm)")
     print(f"height above the stand-on surface: {Z_TOP + LID_T:.1f} mm (lid top), cells end at z = {CELL_TOP:.1f}")
 
 

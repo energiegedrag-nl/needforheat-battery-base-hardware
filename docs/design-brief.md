@@ -25,6 +25,9 @@ The idea dates from the NeedForHeat DataGear backlog (2022); this repository con
    NeedForHeat P1-BASE v3 (CoreInk – P1-BASE – BatteryBASE). The BatteryBASE itself is not stackable.
 8. Never charges the AAA cells (alkaline must never be charged; NiMH is charged outside the device).
 9. Same production approach as the P1-BASE v3: JLCPCB assembly, a 3D-printed enclosure, no soldering by the user.
+10. **Ships by letterbox post** (PostNL letterbox parcel, max. 38 × 26.5 × 3.2 cm) **without cells**: modules ship loose,
+    not stacked, and each stays ≤ 27 mm thick from the lid top to the tips of its LEGO posts (≥ 5 mm for box and
+    padding). The user clicks the modules together.
 
 ## 3. Concept
 

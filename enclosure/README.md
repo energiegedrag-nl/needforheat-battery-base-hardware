@@ -21,6 +21,10 @@ python enclosure/check_fit.py ../needforheat-p1-base-hardware   # needs a checko
 
 Height: 17.6 mm above the surface it stands on (the CoreInk's back or the lid of a P1-BASE v3).
 
+**Shipping:** modules ship loose (not stacked) in a PostNL letterbox parcel (max. 38 × 26.5 × 3.2 cm), without
+cells. Each module must stay ≤ 27 mm thick from the lid top to the tips of its LEGO posts (≥ 5 mm left for box and
+padding); `kuip.py` asserts this. BatteryBASE: 24.6 mm.
+
 ## Assumptions to verify (the PCB is not designed yet)
 
 1. Cells lie on the PCB in PCB-mounted clips or a holder, 1.0 mm above the board surface, 11.2 mm apart, with 5.75 mm at
