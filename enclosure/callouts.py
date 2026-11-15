@@ -24,39 +24,44 @@ IMG = os.path.join(os.path.dirname(HERE), "docs", "images")
 
 ZT, ZL = K.Z_TOP, K.Z_LID
 XL, XR = K.WALL / 2, K.CI_W - K.WALL / 2  # centres of the long walls
-YB = -(K.CI_H - K.WALL / 2)  # centre of the bottom wall (CadQuery y = -board y)
+YT = -(K.WALL / 2)  # centre of the top wall (CadQuery y = -board y): the lid's open end
 CX = K.CI_W / 2
+
+
+def M(y):
+    """CadQuery y of a lid feature drawn at board y with the open end at the bottom, after K.lid_mirror."""
+    return y - K.CI_H
+
 
 # (anchor x, y, z in CadQuery coordinates, label)
 VIEWS = [
-    ("tray-open-end", "battery-base-kuip.stl", 38, -125, [
-        ((XL - 0.2, -30.0, ZT + K.GR_H / 2), "Groove in both long walls and the top wall: the lid's tongue runs in it"),
-        ((CX, YB, ZT), "Dimple in the bottom wall: the lid's click bump drops in here"),
-        ((CX + 8.0, -(K.CI_H - K.WALL / 2), ZT + 1.0), "Open end: the lid slides in and out here, towards the bottom edge"),
-        ((36.0, -52.0, K.GAP + K.PCB_T - 0.2), "Peg in a corner block (3x): keys the PCB;\nthe top-left block has none"),
-        ((CX, -1.0, ZL), "Mark on the top edge (HAT side)"),
-        ((0.0, -30.0, 8.0), "Outside flush with the CoreInk (40 x 56 mm, R3)"),
+    ("tray-open-end", "battery-base-kuip.stl", 38, 55, [
+        ((XL - 0.2, -30.0, ZT + K.GR_H / 2), "Groove in both long walls and the bottom wall: the lid's tongue runs in it"),
+        ((CX, YT, ZT), "Dimple in the top wall: the lid's click bump drops in here"),
+        ((CX - 8.0, YT, ZT + 1.0), "Open end at the top edge: the lid slides in from here\nand stops against the bottom wall"),
+        ((36.0, -4.0, K.GAP + K.PCB_T - 0.2), "Peg in a corner block (3x): keys the PCB;\nthe top-left block has none"),
+        ((K.CI_W, -30.0, 8.0), "Outside flush with the CoreInk (40 x 56 mm, R3)"),
     ]),
     ("cradle", "battery-base-cradle.stl", 40, -125, [
         ((K.CI_W / 2, -(K.WALL + K.CR_CLR + K.RIB_T / 2), K.RIB_TOP), "End rib: backs the contact plates; the spring force\ngoes through it into the tray's short wall"),
-        ((K.CELL_X[1], -K.SADDLE_Y[1], K.AXIS_Z - K.AAA_D / 2), "Saddle (2x): holds the cells 1.75 mm above the PCB,\nso the electronics fit under them"),
+        ((K.CELL_X[1], -K.SADDLE_Y[1], K.AXIS_Z - K.AAA_D / 2), f"Saddle (2x): keeps the cells {K.CELL_LIFT} mm above the PCB\nand apart; notched over the bus header's tails"),
         ((K.WALL + K.CR_CLR + 0.5, -30.0, K.Z_PCB + 4.0), "Side rail: ties ribs and saddles together"),
         ((K.CI_W - 3.0, -(K.CI_H - 3.0), K.Z_PCB), "Drops in on top of the PCB; the lid keeps it down"),
     ]),
-    ("lid-underside", "battery-base-lid.stl", -40, -60, [
-        ((XR - K.GR_D, -30.0, ZT + K.TONGUE_H / 2), "Tongue along both long sides and the top end"),
-        ((CX, -K.DET_Y, ZT - K.DET_H), "Click bump under the flexible tab"),
-        ((CX - K.TAB_W / 2 - K.TAB_SLOT / 2, -(K.CI_H - 3), ZT), "Slots: the tab flexes up when the lid slides"),
-        ((3.0, -(K.CI_H - 0.5), ZT + 1.0), "Cap: full CoreInk width, forms the top of the bottom wall;\nturned round it cannot enter, so the lid fits one way only"),
+    ("lid-underside", "battery-base-lid.stl", -40, 120, [
+        ((XR - K.GR_D, -30.0, ZT + K.TONGUE_H / 2), "Tongue along both long sides and the bottom end"),
+        ((CX, M(K.DET_Y), ZT - K.DET_H), "Click bump under the flexible tab"),
+        ((CX - K.TAB_W / 2 - K.TAB_SLOT / 2, M(K.CI_H - 3), ZT), "Slots: the tab flexes up when the lid slides"),
+        ((3.0, M(K.CI_H - 0.5), ZT + 1.0), "Cap: full CoreInk width, forms the top of the top wall;\nturned round it cannot enter, so the lid fits one way only"),
     ]),
-    ("lid-outside", "battery-base-lid.stl", 55, -60, [
-        ((CX, -(K.CI_H - 5.0), ZT + K.TAB_T + 0.5), "Grip ridges on the thumb rest: push the lid towards the bottom edge"),
-        ((CX - K.TAB_W / 2 - 5.0, -(K.CI_H - 6.0), ZL), "Arrow (2x): the way the lid slides out"),
-        ((CX, -18.0, ZL), "\"3x AAA\""),
+    ("lid-outside", "battery-base-lid.stl", 55, 120, [
+        ((CX, M(K.CI_H - 5.0), ZT + K.TAB_T + 0.5), "Grip ridges on the thumb rest: push the lid up, towards the top edge"),
+        ((CX - K.TAB_W / 2 - 5.0, M(K.CI_H - 6.0), ZL), "Arrow (2x): the way the lid slides out"),
+        ((CX, M(18.0), ZL), "\"3x AAA\""),
     ]),
 ]
 TITLES = {"cradle": "Cradle (separate print): ribs behind the contacts, saddles under the cells",
-          "tray-open-end": "Tray, seen from the bottom edge (lid removed)",
+          "tray-open-end": "Tray, seen from the top edge (lid removed)",
           "lid-underside": "Sliding lid, seen from below (inside)",
           "lid-outside": "Sliding lid, outside (the back of the module)"}
 
@@ -102,7 +107,7 @@ def draw(name, stl, elev, azim, callouts):
 
 
 def sliding(out_by=22.0):
-    """Manual picture: tray with cells, lid slid out `out_by` mm towards the bottom edge."""
+    """Manual picture: tray with cells, lid slid out `out_by` mm towards the top edge."""
     import cadquery as cq
     tray = trimesh.load(os.path.join(HERE, "fabrication", "battery-base-kuip.stl"))
     lid = trimesh.load(os.path.join(HERE, "fabrication", "battery-base-lid.stl"))
@@ -119,7 +124,7 @@ def sliding(out_by=22.0):
     fig = plt.figure(figsize=(11, 8), dpi=120)
     ax = fig.add_axes([0.0, 0.05, 1.0, 0.85], projection="3d")
     tris, cols = [], []
-    for mesh, base, dy in ((tray, [0.30, 0.31, 0.34], 0.0), (lid, [0.50, 0.52, 0.56], -out_by),
+    for mesh, base, dy in ((tray, [0.30, 0.31, 0.34], 0.0), (lid, [0.50, 0.52, 0.56], K.LID_OUT * out_by),
                            (cradle, [0.55, 0.57, 0.62], 0.0), (cont, [0.78, 0.78, 0.82], 0.0),
                            (cell, [0.85, 0.55, 0.15], 0.0)):
         v = mesh.vertices.copy()
@@ -128,12 +133,12 @@ def sliding(out_by=22.0):
         tris.append(v[mesh.faces]); cols.append(np.c_[np.outer(shade, base), np.ones(len(shade))])
     ax.add_collection3d(Poly3DCollection(np.concatenate(tris), facecolors=np.concatenate(cols), edgecolors="none"))
     r = 24
-    ax.set_xlim(20 - r, 20 + r); ax.set_ylim(-38 - r, -38 + r); ax.set_zlim(-6, -6 + 2 * r)
-    ax.set_box_aspect((1, 1, 1)); ax.view_init(elev=35, azim=-120); ax.set_axis_off()
-    fig.text(0.5, 0.95, "Replacing the cells: push the ribbed tab towards the bottom edge; the lid clicks loose and slides out",
+    ax.set_xlim(20 - r, 20 + r); ax.set_ylim(-18 - r, -18 + r); ax.set_zlim(-6, -6 + 2 * r)
+    ax.set_box_aspect((1, 1, 1)); ax.view_init(elev=35, azim=60); ax.set_axis_off()
+    fig.text(0.5, 0.95, "Replacing the cells: push the ribbed tab up; the lid clicks loose and slides out at the top",
              ha="center", va="top", fontsize=12, weight="bold")
     fig.text(0.5, 0.05, "Cells: + and - are printed on the board under each cell; the spring is always the - end. "
-             "Lid back on: slide it in from the bottom edge until it clicks.", ha="center", fontsize=10.5)
+             "Lid back on: slide it in from the top edge until it stops and clicks.", ha="center", fontsize=9)
     out = os.path.join(IMG, "enclosure-lid-sliding.png")
     fig.savefig(out, facecolor="white")
     plt.close(fig)

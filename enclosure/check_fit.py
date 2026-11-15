@@ -74,19 +74,19 @@ for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells)):
 chk("header (tails on top)", hdr, "cells", cells)
 chk("header (tails on top)", hdr, "contacts", cont)
 
-# the sliding lid: path out towards the bottom edge (board +y = CadQuery -y), and the key against turning it round
-tab = K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,
-            K.Z_TOP - 1, K.Z_LID + 1)
+# the sliding lid: path out towards the top edge (CadQuery +y, K.LID_OUT), and the key against turning it round
+tab = K.lid_mirror(K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,
+            K.Z_TOP - 1, K.Z_LID + 1))
 rigid = K.lid().cut(tab).val()
 for s in (0.5, 1, 2, 5, 10, 20, 30, 40, 50, K.CI_H):
-    m = rigid.moved(cq.Location(cq.Vector(0, -s, 0))).wrapped
+    m = rigid.moved(cq.Location(cq.Vector(0, K.LID_OUT * s, 0))).wrapped
     for bn, b in (("tray", tray), ("cells", cells), ("cradle", cradle), ("contacts", cont)):
         v = overlap(m, b)
         if v > 0.005:
             report.append(f"COLLISION lid slid out {s} mm x {bn}: {v:.3f} mm3")
 turned = K.lid().val().rotate(cq.Vector(K.CI_W / 2, -K.CI_H / 2, 0), cq.Vector(K.CI_W / 2, -K.CI_H / 2, 1), 180)
 key_in = next((d for d in (0.5, 1.0, 1.5, 2.0)
-               if overlap(turned.moved(cq.Location(cq.Vector(0, -(K.CI_H - d), 0))).wrapped, tray) > 0.005), None)
+               if overlap(turned.moved(cq.Location(cq.Vector(0, K.LID_OUT * (K.CI_H - d), 0))).wrapped, tray) > 0.005), None)
 if key_in is None:
     report.append("KEY: a lid turned round enters more than 2 mm")
 
