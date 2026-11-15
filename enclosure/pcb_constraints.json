@@ -1,0 +1,178 @@
+{
+ "frame": "board: x right, y down from the CoreInk outline's top-left corner; the PCB is 36.3 x 52.3 from (1.85, 1.85)",
+ "top_side_max_part_height_under_cells": 1.45,
+ "keepout_top": [
+  {
+   "what": "cradle rib (top)",
+   "x": [
+    1.75,
+    38.25
+   ],
+   "y": [
+    1.85,
+    3.25
+   ]
+  },
+  {
+   "what": "cradle rib (bottom)",
+   "x": [
+    1.75,
+    38.25
+   ],
+   "y": [
+    52.75,
+    54.15
+   ]
+  },
+  {
+   "what": "cradle saddle",
+   "x": [
+    1.75,
+    38.25
+   ],
+   "y": [
+    15.0,
+    17.0
+   ]
+  },
+  {
+   "what": "cradle saddle",
+   "x": [
+    1.75,
+    38.25
+   ],
+   "y": [
+    39.0,
+    41.0
+   ]
+  },
+  {
+   "what": "cradle side rail",
+   "x": [
+    1.75,
+    2.75
+   ],
+   "y": [
+    2.75,
+    53.25
+   ]
+  },
+  {
+   "what": "cradle side rail",
+   "x": [
+    37.25,
+    38.25
+   ],
+   "y": [
+    2.75,
+    53.25
+   ]
+  }
+ ],
+ "contacts": [
+  {
+   "part": "bridge MY-AAA-5214",
+   "end": "top",
+   "x": 14.25,
+   "y_plate_centre": 3.5,
+   "width": 21.0,
+   "contacts": [
+    {
+     "x": 8.5,
+     "polarity": "+"
+    },
+    {
+     "x": 20.0,
+     "polarity": "-"
+    }
+   ]
+  },
+  {
+   "part": "+ terminal MY-AAA-15-J",
+   "end": "top",
+   "x": 31.5,
+   "y_plate_centre": 3.5,
+   "width": 9.0,
+   "contacts": [
+    {
+     "x": 31.5,
+     "polarity": "+"
+    }
+   ]
+  },
+  {
+   "part": "- terminal MY-AAA-16-J",
+   "end": "bottom",
+   "x": 8.5,
+   "y_plate_centre": 52.5,
+   "width": 9.0,
+   "contacts": [
+    {
+     "x": 8.5,
+     "polarity": "-"
+    }
+   ]
+  },
+  {
+   "part": "+ plate MY-AAA-15-J",
+   "end": "bottom",
+   "x": 20.0,
+   "y_plate_centre": 52.5,
+   "width": 9.0,
+   "contacts": [
+    {
+     "x": 20.0,
+     "polarity": "+"
+    }
+   ]
+  },
+  {
+   "part": "- spring MY-AAA-16-J",
+   "end": "bottom",
+   "x": 31.5,
+   "y_plate_centre": 52.5,
+   "width": 9.0,
+   "contacts": [
+    {
+     "x": 31.5,
+     "polarity": "-"
+    }
+   ]
+  }
+ ],
+ "cells": [
+  {
+   "x": 8.5,
+   "y_top": 4.55,
+   "plus_end": "top"
+  },
+  {
+   "x": 20.0,
+   "y_top": 6.95,
+   "plus_end": "bottom"
+  },
+  {
+   "x": 31.5,
+   "y_top": 4.55,
+   "plus_end": "top"
+  }
+ ],
+ "pegs": [
+  [
+   36,
+   4
+  ],
+  [
+   4,
+   52
+  ],
+  [
+   36,
+   52
+  ]
+ ],
+ "bus_header_centre": [
+  33.97,
+  36.87
+ ]
+}

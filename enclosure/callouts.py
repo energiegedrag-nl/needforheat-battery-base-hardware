@@ -37,6 +37,12 @@ VIEWS = [
         ((CX, -1.0, ZL), "Mark on the top edge (HAT side)"),
         ((0.0, -30.0, 8.0), "Outside flush with the CoreInk (40 x 56 mm, R3)"),
     ]),
+    ("cradle", "battery-base-cradle.stl", 40, -125, [
+        ((K.CI_W / 2, -(K.WALL + K.CR_CLR + K.RIB_T / 2), K.RIB_TOP), "End rib: backs the contact plates; the spring force\ngoes through it into the tray's short wall"),
+        ((K.CELL_X[1], -K.SADDLE_Y[1], K.AXIS_Z - K.AAA_D / 2), "Saddle (2x): holds the cells 1.75 mm above the PCB,\nso the electronics fit under them"),
+        ((K.WALL + K.CR_CLR + 0.5, -30.0, K.Z_PCB + 4.0), "Side rail: ties ribs and saddles together"),
+        ((K.CI_W - 3.0, -(K.CI_H - 3.0), K.Z_PCB), "Drops in on top of the PCB; the lid keeps it down"),
+    ]),
     ("lid-underside", "battery-base-lid.stl", -40, -60, [
         ((XR - K.GR_D, -30.0, ZT + K.TONGUE_H / 2), "Tongue along both long sides and the top end"),
         ((CX, -K.DET_Y, ZT - K.DET_H), "Click bump under the flexible tab"),
@@ -49,7 +55,8 @@ VIEWS = [
         ((CX, -18.0, ZL), "\"3x AAA\""),
     ]),
 ]
-TITLES = {"tray-open-end": "Tray, seen from the bottom edge (lid removed)",
+TITLES = {"cradle": "Cradle (separate print): ribs behind the contacts, saddles under the cells",
+          "tray-open-end": "Tray, seen from the bottom edge (lid removed)",
           "lid-underside": "Sliding lid, seen from below (inside)",
           "lid-outside": "Sliding lid, outside (the back of the module)"}
 
@@ -99,7 +106,11 @@ def sliding(out_by=22.0):
     import cadquery as cq
     tray = trimesh.load(os.path.join(HERE, "fabrication", "battery-base-kuip.stl"))
     lid = trimesh.load(os.path.join(HERE, "fabrication", "battery-base-lid.stl"))
+    cradle = trimesh.load(os.path.join(HERE, "fabrication", "battery-base-cradle.stl"))
     _, cells, _ = K.fit_parts()
+    cq.exporters.export(K.contacts(), os.path.join(HERE, "fabrication", "_cont.stl"), tolerance=0.05, angularTolerance=0.2)
+    cont = trimesh.load(os.path.join(HERE, "fabrication", "_cont.stl"))
+    os.remove(os.path.join(HERE, "fabrication", "_cont.stl"))
     tmp = os.path.join(HERE, "fabrication", "_cells.stl")
     cq.exporters.export(cells, tmp, tolerance=0.05, angularTolerance=0.2)
     cell = trimesh.load(tmp)
@@ -109,6 +120,7 @@ def sliding(out_by=22.0):
     ax = fig.add_axes([0.0, 0.05, 1.0, 0.85], projection="3d")
     tris, cols = [], []
     for mesh, base, dy in ((tray, [0.30, 0.31, 0.34], 0.0), (lid, [0.50, 0.52, 0.56], -out_by),
+                           (cradle, [0.55, 0.57, 0.62], 0.0), (cont, [0.78, 0.78, 0.82], 0.0),
                            (cell, [0.85, 0.55, 0.15], 0.0)):
         v = mesh.vertices.copy()
         v[:, 1] += dy
@@ -120,7 +132,7 @@ def sliding(out_by=22.0):
     ax.set_box_aspect((1, 1, 1)); ax.view_init(elev=35, azim=-120); ax.set_axis_off()
     fig.text(0.5, 0.95, "Replacing the cells: push the ribbed tab towards the bottom edge; the lid clicks loose and slides out",
              ha="center", va="top", fontsize=12, weight="bold")
-    fig.text(0.5, 0.05, "Cells: the + and - marks are printed on the board under each cell. "
+    fig.text(0.5, 0.05, "Cells: + and - are printed on the board under each cell; the spring is always the - end. "
              "Lid back on: slide it in from the bottom edge until it clicks.", ha="center", fontsize=10.5)
     out = os.path.join(IMG, "enclosure-lid-sliding.png")
     fig.savefig(out, facecolor="white")

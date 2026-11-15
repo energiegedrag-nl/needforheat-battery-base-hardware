@@ -1,5 +1,6 @@
 """Fit check of the BatteryBASE enclosure (CadQuery):
-1. inside the BatteryBASE: tray and lid against the PCB placeholder, the cells and the header;
+1. inside the BatteryBASE: tray, lid and cradle against the PCB placeholder, the contacts, the cells and the
+   header;
 2. on a CoreInk (proxy body: 40 x 56 mm, LEGO through holes, bus socket 8 mm deep, flush);
 3. the sliding lid: it slides out over its whole length without touching the tray or the cells (the click tab
    flexes, so it is left out of this check), and a lid turned round stops within 2 mm of entering;
@@ -47,6 +48,7 @@ def dist(a, b):
 w = lambda wp: wp.val().wrapped  # noqa: E731
 tray, lid = w(K.kuip()), w(K.lid())
 pcb, cells, hdr = (w(x) for x in K.fit_parts())
+cradle, cont = w(K.cradle()), w(K.contacts())
 report, clear = [], []
 
 
@@ -64,6 +66,11 @@ for an, a in (("tray", tray), ("lid", lid)):
     for bn, b in (("PCB", pcb), ("cells", cells), ("header", hdr)):
         chk(an, a, bn, b)
 chk("tray", tray, "lid", lid)
+# cradle and contacts: the cradle sits on the PCB and backs the plates; buttons and springs touch the cells
+for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells), ("contacts", cont), ("header", hdr)):
+    chk("cradle", cradle, bn, b)
+for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells)):
+    chk("contacts", cont, bn, b)
 
 # the sliding lid: path out towards the bottom edge (board +y = CadQuery -y), and the key against turning it round
 tab = K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,
@@ -71,7 +78,7 @@ tab = K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI
 rigid = K.lid().cut(tab).val()
 for s in (0.5, 1, 2, 5, 10, 20, 30, 40, 50, K.CI_H):
     m = rigid.moved(cq.Location(cq.Vector(0, -s, 0))).wrapped
-    for bn, b in (("tray", tray), ("cells", cells)):
+    for bn, b in (("tray", tray), ("cells", cells), ("cradle", cradle), ("contacts", cont)):
         v = overlap(m, b)
         if v > 0.005:
             report.append(f"COLLISION lid slid out {s} mm x {bn}: {v:.3f} mm3")
