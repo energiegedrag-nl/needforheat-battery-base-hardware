@@ -47,6 +47,17 @@
    ]
   },
   {
+   "what": "bus header (THT, tails and fillets on the top side)",
+   "x": [
+    31.43,
+    36.51
+   ],
+   "y": [
+    26.709999999999997,
+    47.03
+   ]
+  },
+  {
    "what": "cradle side rail",
    "x": [
     1.75,

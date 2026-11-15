@@ -71,6 +71,8 @@ for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells), ("co
     chk("cradle", cradle, bn, b)
 for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells)):
     chk("contacts", cont, bn, b)
+chk("header (tails on top)", hdr, "cells", cells)
+chk("header (tails on top)", hdr, "contacts", cont)
 
 # the sliding lid: path out towards the bottom edge (board +y = CadQuery -y), and the key against turning it round
 tab = K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,

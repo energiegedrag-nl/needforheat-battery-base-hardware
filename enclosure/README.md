@@ -56,6 +56,9 @@ padding); `kuip.py` asserts this. BatteryBASE: 25.9 mm.
    uses 0.8 (`BTN_H`); spring free lengths 7.5 ± 0.8 (5214) and 10.5 ± 1 (16-J). Ask JLCPCB whether they solder
    these tabs (THT) and order a few loose for the print check.
 2. Nothing on the PCB under the cells taller than 1.45 mm; nothing under the cradle's ribs, saddles and rails.
+   The bus header is a plain 2x8 male header, pins down (the BatteryBASE ends the stack: no socket on top, unlike the
+   P1-BASE's stacking J1). Its tails stand 1.4 mm above the PCB top (standard 2.5 / 6.0 / 3.0 header, `HDR_TAIL`,
+   VERIFY with the chosen part) under cell 3, 0.42 mm clear of it; the saddle at y = 40 has a notch over it.
 3. Sliding fit and click (MJF PA12): 0.2 mm play per side (`SL_CLR`), bump 0.4 mm (`DET_H`), tab 1.3 mm thick and
    about 9.5 mm free (`TAB_T`, `TAB_L`). Estimated: about 4 N on the tab's bump, about 6 N to pull the lid open.
    Adjust after a test print.

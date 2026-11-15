@@ -58,6 +58,10 @@ PCB_T = 1.6
 INSET = WALL + CLR  # PCB = CoreInk outline minus INSET on every side: 36.3 x 52.3 mm (as the P1-BASE v3)
 PEGS = [(36, 4), (4, 52), (36, 52)]  # Ø2.2 NPTH in the PCB, as on the P1-BASE v3; the top-left corner keys the PCB
 HDR_PIN = 6.0  # header pins below the plastic, into the socket below
+# The bus header: a plain 2x8 male pin header, pins down (the BatteryBASE ends the stack, so no socket on top, unlike
+# the P1-BASE's stacking J1). Through-hole: the PCB-side tails stick out on the top side, under cell 3.
+HDR_TAIL = 1.4  # tail above the PCB top: standard 2.5 / 6.0 / 3.0 header on a 1.6 mm board (VERIFY with the part)
+HDR_FILLET = 0.5  # solder fillet around each tail, Ø1.7
 AAA_D, AAA_L = 10.5, 44.5
 AAA_L_MIN = 43.5  # shortest AAA cell to still make contact (IEC LR03: 43.3 to 44.5; VERIFY with real cells)
 Z_PCB = GAP + PCB_T  # PCB top
@@ -281,6 +285,9 @@ def cradle():
         inside.intersect(box(x0 - 1, x1 + 1, CI_H - Y_RIB, CI_H, Z_PCB, RIB_TOP)))
     for y in SADDLE_Y:
         body = body.union(box(x0, x1, y - SADDLE_W / 2, y + SADDLE_W / 2, Z_PCB, AXIS_Z))
+    # notch over the bus header's tails and solder fillets (the saddle at y = 40 crosses it)
+    body = body.cut(box(BUS[0] - BUS_W / 2 - 0.6, BUS[0] + BUS_W / 2 + 0.6, BUS[1] - BUS_H / 2 - 0.6,
+                        BUS[1] + BUS_H / 2 + 0.6, Z_PCB - 0.1, Z_PCB + HDR_TAIL + 0.4))
     for xa, xb in ((x0, x0 + RAIL_W), (x1 - RAIL_W, x1)):
         body = body.union(box(xa, xb, Y_RIB - 0.5, CI_H - Y_RIB + 0.5, Z_PCB, Z_PCB + 4.0))
     for x in CELL_X:  # cradles for the cells, between the end ribs only (the ribs back the plates over their full face)
@@ -302,7 +309,11 @@ def fit_parts():
         cells = c if cells is None else cells.union(c)
     hdr = cq.Workplane("XY").center(*P(*BUS)).rect(BUS_W, BUS_H).extrude(GAP)
     pts = [(BUS[0] + (c - 0.5) * 2.54, BUS[1] + (r - 3.5) * 2.54) for c in range(2) for r in range(8)]
-    pins = cq.Workplane("XY").pushPoints([P(*p) for p in pts]).rect(0.64, 0.64).extrude(-HDR_PIN)
+    pins = (cq.Workplane("XY").workplane(offset=Z_PCB + HDR_TAIL).pushPoints([P(*p) for p in pts]).rect(0.64, 0.64)
+            .extrude(-(Z_PCB + HDR_TAIL + HDR_PIN)))
+    fillets = (cq.Workplane("XY").workplane(offset=Z_PCB).pushPoints([P(*p) for p in pts]).circle(0.85)
+               .extrude(HDR_FILLET))
+    pins = pins.union(fillets)
     return pcb, cells, hdr.union(pins)
 
 
@@ -314,6 +325,8 @@ def pcb_constraints():
     keepout = [dict(what="cradle rib (top)", x=[x0, x1], y=[INSET, Y_RIB]),
                dict(what="cradle rib (bottom)", x=[x0, x1], y=[CI_H - Y_RIB, CI_H - INSET])]
     keepout += [dict(what="cradle saddle", x=[x0, x1], y=[y - SADDLE_W / 2, y + SADDLE_W / 2]) for y in SADDLE_Y]
+    keepout += [dict(what="bus header (THT, tails and fillets on the top side)", x=[BUS[0] - BUS_W / 2, BUS[0] + BUS_W / 2],
+                     y=[BUS[1] - BUS_H / 2, BUS[1] + BUS_H / 2])]
     keepout += [dict(what="cradle side rail", x=list(xr), y=[Y_RIB - 0.5, CI_H - Y_RIB + 0.5])
                 for xr in ((x0, x0 + RAIL_W), (x1 - RAIL_W, x1))]
     cons = []
