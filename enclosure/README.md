@@ -31,7 +31,7 @@ their contacts on the **back side** (towards the lid).
   shows the compartment as built and the options that were dropped (bridge MY-AAA-5214: it fixes the cell axis at
   7.0 mm above the PCB; leaf contacts; a complete holder).
 * **Cradle** (`battery-base-cradle`, a third print): drops in on top of the PCB. End ribs back the contact plates
-  (the spring force goes into the tray's short walls); two low saddles (y = 14 and 25.5) keep the cells apart and
+  (the spring force goes into the tray's short walls); three low saddles (y = 14, 25.5 and 48) keep the cells apart and
   0.8 mm up, both clear of the bus header's pins. The PCB's keep-outs (both sides), contact and cell positions are in
   [`pcb_constraints.json`](pcb_constraints.json).
 * **Plugging in and pulling off** with the whole module: the cradle's end ribs reach to 0.1 mm under the lid, so

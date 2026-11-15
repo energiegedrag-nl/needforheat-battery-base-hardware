@@ -255,12 +255,13 @@ def cell_marks(b, cons):
 
 
 def set_netclasses(b):
-    """Wider tracks for the power path (up to about 0.3 A from the cells)."""
+    """Wider tracks for the power path (up to about 0.3 A from the cells); 0.3 mm, as wide as the 0.5 mm pitch
+    pins of U1 (SOT-563)."""
     ds = b.GetDesignSettings()
     ns = ds.m_NetSettings
     try:
         nc = pcbnew.NETCLASS("Power")
-        nc.SetTrackWidth(MM(0.5)); nc.SetClearance(MM(0.2)); nc.SetViaDiameter(MM(0.7)); nc.SetViaDrill(MM(0.35))
+        nc.SetTrackWidth(MM(0.3)); nc.SetClearance(MM(0.2)); nc.SetViaDiameter(MM(0.6)); nc.SetViaDrill(MM(0.3))
         ns.SetNetclass("Power", nc)
         for net in ("BAT_RAW", "VCELL", "SW", "V5B", "TPBAT", "VLIPO", "N12", "N23"):
             ns.SetNetclassPatternAssignment(net, "Power")
@@ -319,7 +320,7 @@ def build(route=True):
         if bi == 1 and VARIANT:
             k = VARIANT % len(refs)
             refs = refs[k:] + refs[:k]
-        place_block(fps, rect, refs, obstacles, gap=0.3)
+        place_block(fps, rect, refs, obstacles, gap=float(os.environ.get("BBASE_GAP", "0.5")))
         placed.update(refs)
     missing = set(fps) - placed
     if missing:
@@ -571,7 +572,7 @@ def autoroute(path):
     ses = path[:-10] + ".ses"
     if not pcbnew.ExportSpecctraDSN(b, dsn):
         raise SystemExit("DSN export failed")
-    cmd = [JAVA, "-Xmx2g", "-jar", FREEROUTING, "-de", dsn, "-do", ses, "-mp", "30", "-mt", "0", "--gui.enabled=false"]
+    cmd = [JAVA, "-Xmx" + os.environ.get("BBASE_JAVA_XMX", "2g"), "-jar", FREEROUTING, "-de", dsn, "-do", ses, "-mp", os.environ.get("BBASE_PASSES", "100"), "-mt", "0", "--gui.enabled=false"]
     print(" ".join(cmd))
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=int(os.environ.get("BBASE_ROUTE_TIMEOUT", "900")))
     print(r.stdout[-3000:], r.stderr[-3000:])

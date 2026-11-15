@@ -108,7 +108,9 @@ Y_RIB = WALL + CR_CLR + RIB_T  # inner face of the top rib = back of the top pla
 Y_FACE = [Y_RIB + PLATE_T, CI_H - Y_RIB - PLATE_T]  # contact faces of the plates, top and bottom
 SPRING_LEN = Y_FACE[1] - Y_FACE[0] - BTN_H - AAA_L  # compressed spring length with a full-length cell
 assert 2.8 <= SPRING_LEN and SPRING_LEN + (AAA_L - AAA_L_MIN) <= 5.0, f"spring {SPRING_LEN:.1f} mm"
-SADDLE_Y = [14.0, 25.5]  # saddle bars (2 mm wide): keep-out strips on the PCB; both clear of the bus header's pins
+# saddle bars (2 mm wide, keep-out strips on the PCB), all clear of the bus header's pins: two above them and one
+# just below them, near the cells' bottom ends, so the cells cannot wobble
+SADDLE_Y = [14.0, 25.5, 48.0]
 SADDLE_W = 2.0
 HDR_Y = (BUS[1] - 3.5 * 2.54 - 0.85, BUS[1] + 3.5 * 2.54 + 0.85)  # first and last pin, solder fillets included
 assert all(y + SADDLE_W / 2 + 0.3 < HDR_Y[0] or y - SADDLE_W / 2 - 0.3 > HDR_Y[1] for y in SADDLE_Y), "saddle on the header"
