@@ -33,6 +33,10 @@ their contacts on the **back side** (towards the lid).
   (the spring force goes into the tray's short walls); two low saddles keep the cells apart and 0.8 mm up, notched
   over the bus header's tails. The PCB's keep-outs (both sides), contact and cell positions are in
   [`pcb_constraints.json`](pcb_constraints.json).
+* **Plugging in and pulling off** with the whole module: the cradle's end ribs reach to 0.1 mm under the lid, so
+  the cradle clamps the PCB between the lid and the tray's corner blocks. Pushing on the tray or the lid: tray ->
+  grooves -> lid -> ribs -> PCB -> header pins. Pulling on the tray: corner blocks under the PCB -> PCB -> pins.
+  Push it on with the lid in place; pulling it off also works without the lid.
 * **Sliding lid** (`battery-base-lid`), like a remote control's battery door. It slides in from the **top edge**
   (HAT side) and stops against the bottom wall, so it stays in when the CoreInk hangs or stands, even if its click
   tab breaks. Its tongue runs in grooves in the long walls and the bottom wall. A flexible tab at the top end

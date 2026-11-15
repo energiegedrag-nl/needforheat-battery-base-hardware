@@ -110,7 +110,12 @@ RAIL_W = 1.0  # side rails along the long walls tie the ribs and saddles togethe
 LID_T = 2.0
 Z_TOP = CELL_TOP + 0.5  # lid underside: flat, 0.5 mm above the cells; the lid stops them from jumping out of the
 # saddles. No ribs under the lid: they would hit the bottom wall when the lid slides out.
-RIB_TOP = Z_PCB + PLATE_Z0 + SINGLE_H + 0.5  # cradle end ribs: just above the plates, well under the lid
+# Cradle end ribs reach up to just under the lid: the cradle is the clamp between the lid and the PCB. Pushing the
+# module onto the CoreInk: tray -> grooves -> lid tongue -> lid -> ribs -> PCB -> header pins (and pushing on the lid
+# goes straight lid -> ribs). Pulling it off: tray -> corner blocks under the PCB -> header pins. Play in the chain:
+# groove 0.2 + RIB_GAP.
+RIB_GAP = 0.1  # rib top to lid underside: the lid slides over the ribs
+RIB_TOP = Z_TOP - RIB_GAP
 Z_LID = Z_TOP + LID_T  # outer face
 GR_D = 0.7  # groove depth into the long walls and the top wall (the lid's tongue runs in it)
 TONGUE_H = 0.8  # tongue: the lower part of the lid's edge
