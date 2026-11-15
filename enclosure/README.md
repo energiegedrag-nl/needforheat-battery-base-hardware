@@ -7,6 +7,7 @@ Generated with CadQuery by [`kuip.py`](kuip.py); the fit check is [`check_fit.py
 python enclosure/kuip.py                                   # writes enclosure/fabrication/*.step / *.stl
 python enclosure/check_fit.py ../needforheat-p1-base-hardware   # needs a checkout of the P1-BASE repository
 python enclosure/callouts.py                                # pictures in docs/images (needs matplotlib, trimesh)
+python enclosure/sketch_contacts.py                         # docs/images/sketch-aaa-contacts.png
 ```
 
 ## What it is
@@ -26,12 +27,12 @@ their contacts on the **back side** (towards the lid).
 * **Cell contacts** (back side): six MYOUNG plates, tabs soldered in PCB slots by JLCPCB (THT; listed as "Wave
   Soldering, Economic and Standard PCBA"): three + plates MY-AAA-15-J (C51889749) and three − springs MY-AAA-16-J
   (C51889750), linked in series by PCB tracks. The spring is always the minus end. Cell pitch 11.5 mm, cells 0.8 mm
-  above the PCB (axis 6.05 mm), springs compressed to 3.2 mm (4.2 mm with a 43.5 mm cell). The earlier options
-  (bridge MY-AAA-5214, leaf contacts, a complete holder) are in [the sketch](../docs/images/sketch-aaa-contacts.png);
-  the bridge was dropped because it fixes the cell axis at 7.0 mm above the PCB.
+  above the PCB (axis 6.05 mm), springs compressed to 3.2 mm (4.2 mm with a 43.5 mm cell). [The sketch](../docs/images/sketch-aaa-contacts.png)
+  shows the compartment as built and the options that were dropped (bridge MY-AAA-5214: it fixes the cell axis at
+  7.0 mm above the PCB; leaf contacts; a complete holder).
 * **Cradle** (`battery-base-cradle`, a third print): drops in on top of the PCB. End ribs back the contact plates
-  (the spring force goes into the tray's short walls); two low saddles keep the cells apart and 0.8 mm up, notched
-  over the bus header's tails. The PCB's keep-outs (both sides), contact and cell positions are in
+  (the spring force goes into the tray's short walls); two low saddles (y = 14 and 25.5) keep the cells apart and
+  0.8 mm up, both clear of the bus header's pins. The PCB's keep-outs (both sides), contact and cell positions are in
   [`pcb_constraints.json`](pcb_constraints.json).
 * **Plugging in and pulling off** with the whole module: the cradle's end ribs reach to 0.1 mm under the lid, so
   the cradle clamps the PCB between the lid and the tray's corner blocks. Pushing on the tray or the lid: tray ->

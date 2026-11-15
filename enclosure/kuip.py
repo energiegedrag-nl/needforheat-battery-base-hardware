@@ -102,8 +102,10 @@ Y_RIB = WALL + CR_CLR + RIB_T  # inner face of the top rib = back of the top pla
 Y_FACE = [Y_RIB + PLATE_T, CI_H - Y_RIB - PLATE_T]  # contact faces of the plates, top and bottom
 SPRING_LEN = Y_FACE[1] - Y_FACE[0] - BTN_H - AAA_L  # compressed spring length with a full-length cell
 assert 2.8 <= SPRING_LEN and SPRING_LEN + (AAA_L - AAA_L_MIN) <= 5.0, f"spring {SPRING_LEN:.1f} mm"
-SADDLE_Y = [16.0, 40.0]  # saddle bars (2 mm wide): keep-out strips on the PCB
+SADDLE_Y = [14.0, 25.5]  # saddle bars (2 mm wide): keep-out strips on the PCB; both clear of the bus header's pins
 SADDLE_W = 2.0
+HDR_Y = (BUS[1] - 3.5 * 2.54 - 0.85, BUS[1] + 3.5 * 2.54 + 0.85)  # first and last pin, solder fillets included
+assert all(y + SADDLE_W / 2 + 0.3 < HDR_Y[0] or y - SADDLE_W / 2 - 0.3 > HDR_Y[1] for y in SADDLE_Y), "saddle on the header"
 RAIL_W = 1.0  # side rails along the long walls tie the ribs and saddles together
 
 # --- sliding lid -------------------------------------------------------------------------------------------
@@ -291,9 +293,6 @@ def cradle():
         inside.intersect(box(x0 - 1, x1 + 1, CI_H - Y_RIB, CI_H, Z_PCB, RIB_TOP)))
     for y in SADDLE_Y:
         body = body.union(box(x0, x1, y - SADDLE_W / 2, y + SADDLE_W / 2, Z_PCB, AXIS_Z))
-    # notch over the bus header's tails and solder fillets (the saddle at y = 40 crosses it)
-    body = body.cut(box(BUS[0] - BUS_W / 2 - 0.6, BUS[0] + BUS_W / 2 + 0.6, BUS[1] - BUS_H / 2 - 0.6,
-                        BUS[1] + BUS_H / 2 + 0.6, Z_PCB - 0.1, Z_PCB + HDR_TAIL + 0.4))
     for xa, xb in ((x0, x0 + RAIL_W), (x1 - RAIL_W, x1)):
         body = body.union(box(xa, xb, Y_RIB - 0.5, CI_H - Y_RIB + 0.5, Z_PCB, Z_PCB + 4.0))
     for x in CELL_X:  # cradles for the cells, between the end ribs only (the ribs back the plates over their full face)

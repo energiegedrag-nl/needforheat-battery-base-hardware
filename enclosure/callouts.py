@@ -44,7 +44,7 @@ VIEWS = [
     ]),
     ("cradle", "battery-base-cradle.stl", 40, -125, [
         ((K.CI_W / 2, -(K.WALL + K.CR_CLR + K.RIB_T / 2), K.RIB_TOP), "End rib: backs the contact plates; the spring force\ngoes through it into the tray's short wall"),
-        ((K.CELL_X[1], -K.SADDLE_Y[1], K.AXIS_Z - K.AAA_D / 2), f"Saddle (2x): keeps the cells {K.CELL_LIFT} mm above the PCB\nand apart; notched over the bus header's tails"),
+        ((K.CELL_X[1], -K.SADDLE_Y[1], K.AXIS_Z - K.AAA_D / 2), f"Saddle (2x): keeps the cells {K.CELL_LIFT} mm above the PCB\nand apart; both clear of the bus header's pins"),
         ((K.WALL + K.CR_CLR + 0.5, -30.0, K.Z_PCB + 4.0), "Side rail: ties ribs and saddles together"),
         ((K.CI_W - 3.0, -(K.CI_H - 3.0), K.Z_PCB), "Drops in on top of the PCB; the lid keeps it down"),
     ]),
