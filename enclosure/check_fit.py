@@ -1,7 +1,9 @@
 """Fit check of the BatteryBASE enclosure (CadQuery):
 1. inside the BatteryBASE: tray and lid against the PCB placeholder, the cells and the header;
 2. on a CoreInk (proxy body: 40 x 56 mm, LEGO through holes, bus socket 8 mm deep, flush);
-3. on a P1-BASE v3: its lid and populated board from a checkout of needforheat-p1-base-hardware
+3. the sliding lid: it slides out over its whole length without touching the tray or the cells (the click tab
+   flexes, so it is left out of this check), and a lid turned round stops within 2 mm of entering;
+4. on a P1-BASE v3: its lid and populated board from a checkout of needforheat-p1-base-hardware
    (enclosure/fabrication/p1-base-lid.step and enclosure/p1-base-v3-pcb.step), moved so that the P1-BASE lid top is
    the stand-on surface (z = 0).
 Usage: python enclosure/check_fit.py [path to needforheat-p1-base-hardware]
@@ -63,6 +65,22 @@ for an, a in (("tray", tray), ("lid", lid)):
         chk(an, a, bn, b)
 chk("tray", tray, "lid", lid)
 
+# the sliding lid: path out towards the bottom edge (board +y = CadQuery -y), and the key against turning it round
+tab = K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,
+            K.Z_TOP - 1, K.Z_LID + 1)
+rigid = K.lid().cut(tab).val()
+for s in (0.5, 1, 2, 5, 10, 20, 30, 40, 50, K.CI_H):
+    m = rigid.moved(cq.Location(cq.Vector(0, -s, 0))).wrapped
+    for bn, b in (("tray", tray), ("cells", cells)):
+        v = overlap(m, b)
+        if v > 0.005:
+            report.append(f"COLLISION lid slid out {s} mm x {bn}: {v:.3f} mm3")
+turned = K.lid().val().rotate(cq.Vector(K.CI_W / 2, -K.CI_H / 2, 0), cq.Vector(K.CI_W / 2, -K.CI_H / 2, 1), 180)
+key_in = next((d for d in (0.5, 1.0, 1.5, 2.0)
+               if overlap(turned.moved(cq.Location(cq.Vector(0, -(K.CI_H - d), 0))).wrapped, tray) > 0.005), None)
+if key_in is None:
+    report.append("KEY: a lid turned round enters more than 2 mm")
+
 # 2. on a CoreInk
 core = cq.Workplane("XY").center(K.CI_W / 2, -K.CI_H / 2).rect(K.CI_W, K.CI_H).extrude(-16).edges("|Z").fillet(K.CI_R)
 for (x, y) in K.LEGO_HOLES:
@@ -73,7 +91,7 @@ chk("tray", tray, "CoreInk", core)
 chk("header", hdr, "CoreInk", core)
 pins_in = -min(bbox(hdr)[2], 0)
 
-# 3. on a P1-BASE v3
+# 4. on a P1-BASE v3
 p1_lid_f = os.path.join(P1, "enclosure", "fabrication", "p1-base-lid.step")
 p1 = None
 if os.path.exists(p1_lid_f):
@@ -110,6 +128,7 @@ if os.path.exists(p1_lid_f):
 print("COLLISIONS:", "\n  ".join([""] + report) if report else "none")
 print("closest approach < 0.5 mm:", sorted(clear))
 print(f"lid top {K.Z_TOP + K.LID_T:.1f} mm above the stand-on surface; cells {K.AAA_D} mm, top at z = {K.CELL_TOP:.1f}")
+print(f"sliding lid: slides out freely; turned round it stops after {key_in} mm")
 print(f"header pins reach {pins_in:.1f} mm below the stand-on surface (CoreInk socket 8.0 mm deep)")
 if p1:
     print(f"on a P1-BASE: its J1 socket top at z = {p1[1]:.2f} (0 = flush with the P1-BASE lid)")
