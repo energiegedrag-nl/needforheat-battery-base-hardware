@@ -68,7 +68,7 @@ def top_view(ax):
     note(ax, (W - WALL - 1, K.Y_RIB - 0.8), "cradle rib: backs the plates,\nreaches to just under the lid", W + 2, 9)
     note(ax, (x0 + 2, K.SADDLE_Y[1]), f"cradle saddles at y = {K.SADDLE_Y[0]:g} and\n{K.SADDLE_Y[1]:g}: cells "
          f"{K.CELL_LIFT} mm up,\nclear of the bus header", -2, 32)
-    note(ax, (bx, by + 4), "2x8 bus header (underside);\nits tails ≤ 0.4 mm proud here", -2, 46, "black")
+    note(ax, (bx, by + 4), f"2x8 bus header (underside, THT);\nits tails {K.HDR_TAIL:.1f} mm proud here", -2, 46, "black")
     note(ax, ((K.CELL_X[0] + K.CELL_X[1]) / 2, K.INSET + 0.4), "series links: PCB tracks", -2, -2, "#2b8a3e")
 
 

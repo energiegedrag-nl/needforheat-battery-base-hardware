@@ -63,9 +63,10 @@ PEGS = [(36, 4), (4, 52), (36, 52)]  # Ø2.2 NPTH in the PCB, as on the P1-BASE 
 HDR_PIN = 6.0  # header pins below the plastic, into the socket below
 # The bus header: a plain 2x8 male pin header, pins down (the BatteryBASE ends the stack, so no socket on top, unlike
 # the P1-BASE's stacking J1), inserted from the underside. Through-hole: its tails stick out on the back side,
-# under cell 3, and set how low the cells can lie (CELL_LIFT). A header with a short PCB tail (2.0 mm: 0.4 mm proud)
-# keeps the cells low; a standard 2.5 / 6.0 / 3.0 header (1.4 mm proud) would need about 1.75 mm lift.
-HDR_TAIL = 0.4  # tail above the PCB's back side (VERIFY with the chosen part)
+# under cell 3, and set how low the cells can lie (CELL_LIFT). Part: XKB X6521WV-2x08H-C60D30 (C706898): 2.5 mm
+# plastic, 6.0 mm pins, 3.0 mm PCB tail. No shorter tail is in stock at JLCPCB, and the SMD version does not fit:
+# its feet reach 4.2 mm out from the centre line, past the PCB edge next to the tray wall.
+HDR_TAIL = 3.0 - PCB_T  # 1.4 mm proud of the PCB's back side
 HDR_FILLET = 0.5  # solder fillet around each tail, Ø1.7
 BOTTOM_PART_H = GAP - 0.3  # tallest part on the PCB's underside (it faces the CoreInk's back or the P1-BASE's lid)
 AAA_D, AAA_L = 10.5, 44.5
@@ -82,12 +83,17 @@ Z_PCB = GAP + PCB_T  # PCB top
 CELL_PITCH = 11.5
 CELL_X = [CI_W / 2 - CELL_PITCH, CI_W / 2, CI_W / 2 + CELL_PITCH]
 PLUS_TOP = [True, False, True]  # where each cell's + end is (top = HAT edge)
-CELL_LIFT = 0.8  # cells above the PCB: clear of the bus header's tails and fillets under cell 3 (checked)
+CELL_LIFT = 1.6  # cells above the PCB: clear of the bus header's tails and fillets under cell 3 (checked)
 CONTACT_Z = CELL_LIFT + AAA_D / 2  # cell axis above the PCB top
 AXIS_Z = Z_PCB + CONTACT_Z
 CELL_TOP = AXIS_Z + AAA_D / 2
 SINGLE_W, SINGLE_H, SINGLE_TAB = 9.0, 8.8, 4.0
-PLATE_Z0 = CONTACT_Z - SINGLE_H / 2  # plate's lower edge above the PCB
+# plate's lower edge above the PCB: centred on the cell axis, but low enough for the tab to stick out 0.5 mm under
+# the PCB for its solder joint (the contact centre then sits up to 0.6 mm under the axis; the + button, Ø4, still
+# covers the cell's + nub, Ø3.8, VERIFY)
+PLATE_Z0 = min(CONTACT_Z - SINGLE_H / 2, SINGLE_TAB - PCB_T - 0.5)
+CONTACT_DROP = CONTACT_Z - (PLATE_Z0 + SINGLE_H / 2)  # contact centre below the cell axis
+assert CONTACT_DROP <= 0.7, f"contact {CONTACT_DROP:.2f} mm under the cell axis"
 assert SINGLE_TAB - PLATE_Z0 > PCB_T + 0.3, "the plate's tab does not reach through the PCB"
 PLATE_T = 0.5  # pocket for the plates (0.3 thick)
 BTN_H = 0.8  # + button height in front of its plate (15-J: 1.43 - 0.3 = about 1.1 per drawing, VERIFY)

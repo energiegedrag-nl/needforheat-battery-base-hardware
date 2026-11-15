@@ -1,6 +1,6 @@
 COLLISIONS: none
-closest approach < 0.5 mm: [(0.0, 'contacts', 'cells'), (0.0, 'cradle', 'PCB'), (0.0, 'cradle', 'contacts'), (0.0, 'tray', 'CoreInk'), (0.0, 'tray', 'PCB'), (0.0, 'tray', 'lid'), (0.0, 'tray (crush ribs only, 1.33 mm3)', 'P1-BASE lid'), (0.1, 'cradle', 'lid'), (0.13, 'cradle', 'tray'), (0.15, 'cradle', 'cells'), (0.2, 'header', 'CoreInk'), (0.25, 'header', 'P1-BASE lid'), (0.31, 'header (tails on top)', 'cells'), (0.5, 'lid', 'cells')]
-lid top 17.9 mm above the stand-on surface; cells 10.5 mm, top at z = 15.4
+closest approach < 0.5 mm: [(0.0, 'contacts', 'cells'), (0.0, 'cradle', 'PCB'), (0.0, 'cradle', 'contacts'), (0.0, 'tray', 'CoreInk'), (0.0, 'tray', 'PCB'), (0.0, 'tray', 'lid'), (0.0, 'tray (crush ribs only, 1.33 mm3)', 'P1-BASE lid'), (0.1, 'cradle', 'lid'), (0.13, 'cradle', 'tray'), (0.15, 'cradle', 'cells'), (0.2, 'header', 'CoreInk'), (0.25, 'header', 'P1-BASE lid'), (0.27, 'header (tails on top)', 'cells')]
+lid top 18.7 mm above the stand-on surface; cells 10.5 mm, top at z = 16.2
 sliding lid: slides out freely; turned round it stops after 1.0 mm
 header pins reach 6.0 mm below the stand-on surface (CoreInk socket 8.0 mm deep)
 on a P1-BASE: its J1 socket top at z = -0.00 (0 = flush with the P1-BASE lid)
