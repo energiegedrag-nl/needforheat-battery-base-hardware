@@ -33,6 +33,13 @@ padding); `kuip.py` asserts this. BatteryBASE: 24.6 mm.
    bottom side (the bottom is open between the corner blocks, 2.5 mm high, minus the header).
 3. Snap fit (bump 0.35 mm, groove 0.55 mm): same values as the P1-BASE; adjust `SNAP_P` after a test print.
 
+## Printed fit check (November 2026)
+
+Five sets of tray + lid (`fabrication/*.stl` as of 15 November 2026) go into the same JLCPCB order as the P1-BASE v3
+prototype: JLC3DP, MJF PA12 black, $ 18.70 for five sets. Purpose: check the stack CoreInk – P1-BASE – BatteryBASE
+in hand (LEGO posts, snap fit, header reach) before the BatteryBASE PCB is designed. If the PCB later needs other
+dimensions, the enclosure is reprinted.
+
 ## Fit check (15 November 2026)
 
 No collisions inside the BatteryBASE, on a CoreInk (proxy body) or on a P1-BASE v3 (its lid and raised J1 socket from
