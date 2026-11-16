@@ -592,7 +592,7 @@
 			(effects
 				(font
 					(size 1.27 1.27))))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-15-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 0 -6.35 0)
 			(effects
 				(font
@@ -604,7 +604,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "Description" "AAA cell contact plate (MYOUNG MY-AAA-15-J + button or MY-AAA-16-J - spring), one tab in a PCB slot"
+		(property "Description" "AAA cell leaf contact (MYOUNG MY-AAA-01, the same part at both ends), two pins through the PCB"
 			(at 0 0 0)
 			(effects
 				(font

@@ -122,8 +122,8 @@ def write_custom_lib():
                ("G14", "G14", "passive"), ("G22", "G22/SCL", "passive"), ("G36", "G36", "passive"),
                ("G26", "G26", "passive"), ("G25", "G25", "passive")], half_w=10.16, hide_numbers=True)
     contact = _box_symbol(
-        "CellContact", "BC", "cell contact", "bbase:MYOUNG_MY-AAA-15-J",
-        "AAA cell contact plate (MYOUNG MY-AAA-15-J + button or MY-AAA-16-J - spring), one tab in a PCB slot",
+        "CellContact", "BC", "cell contact", "bbase:MYOUNG_MY-AAA-01",
+        "AAA cell leaf contact (MYOUNG MY-AAA-01, the same part at both ends), two pins through the PCB",
         left=[("1", "C", "passive")], right=[], half_w=3.81)
     lib = [S("kicad_symbol_lib"), [S("version"), 20231120], [S("generator"), "gen_schematic.py"],
            [S("generator_version"), "1.0"], tp, boost, det, bus, contact] + [_power_symbol(n) for n in POWER_NETS[1:]]
@@ -163,11 +163,8 @@ def PMOS(ref, g, d, s):
 
 
 def CONTACT(ref, plus, net, where):
-    if plus:
-        return dict(ref=ref, lib="bbase:CellContact", value="+ plate", fp="bbase:MYOUNG_MY-AAA-15-J",
-                    lcsc="C51889749", nets={"1": net})
-    return dict(ref=ref, lib="bbase:CellContact", value="- spring", fp="bbase:MYOUNG_MY-AAA-16-J",
-                lcsc="C51889750", nets={"1": net})
+    return dict(ref=ref, lib="bbase:CellContact", value="+ leaf" if plus else "- leaf", fp="bbase:MYOUNG_MY-AAA-01",
+                lcsc="C964855", nets={"1": net})
 
 
 def TP(ref, net):
@@ -556,9 +553,9 @@ def draw(s):
     for name, pt in (("N12", (45.72, 29.21)), ("N23", (71.12, 76.2)), ("BAT_RAW", (91.44, 31.75))):
         s.label(name, pt, "r", 1.0)
     notes(s, 20.32, 91.44, [
-        "Three AAA cells in series. Contacts: MYOUNG MY-AAA-15-J (+ plate)",
-        "and MY-AAA-16-J (- spring), tabs soldered in PCB slots (THT), on the",
-        "PCB's back side, leaning on the printed cradle. Spring = minus end.",
+        "Three AAA cells in series. Contacts: six MYOUNG MY-AAA-01 leaf",
+        "contacts (THT, two pins each) on the PCB's back side; the cells lie",
+        "on their feet. Polarity is printed on the PCB under each cell.",
         "Q1: reverse-polarity protection (pack in backwards).",
         "VCELL 2.7 ... 4.8 V (alkaline), 3.0 ... 4.2 V (NiMH).",
         "Nothing draws from the cells while not charging except U4 and",

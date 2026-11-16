@@ -29,7 +29,7 @@
 				(effects
 					(font
 						(size 1.27 1.27))))
-			(property "Footprint" "bbase:MYOUNG_MY-AAA-15-J"
+			(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 				(at 0 -6.35 0)
 				(effects
 					(font
@@ -41,7 +41,7 @@
 					(font
 						(size 1.27 1.27))
 					(hide yes)))
-			(property "Description" "AAA cell contact plate (MYOUNG MY-AAA-15-J + button or MY-AAA-16-J - spring), one tab in a PCB slot"
+			(property "Description" "AAA cell leaf contact (MYOUNG MY-AAA-01, the same part at both ends), two pins through the PCB"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2548,13 +2548,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "+ plate"
+		(property "Value" "+ leaf"
 			(at 36.83 41.27 90)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-15-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 33.02 39.37 0)
 			(effects
 				(font
@@ -2566,7 +2566,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C51889749"
+		(property "LCSC" "C964855"
 			(at 33.02 39.37 0)
 			(effects
 				(font
@@ -2594,13 +2594,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify right)))
-		(property "Value" "- spring"
+		(property "Value" "- leaf"
 			(at 36.83 66.67 90)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify right)))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-16-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 33.02 64.77 0)
 			(effects
 				(font
@@ -2612,7 +2612,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C51889750"
+		(property "LCSC" "C964855"
 			(at 33.02 64.77 0)
 			(effects
 				(font
@@ -2658,13 +2658,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "- spring"
+		(property "Value" "- leaf"
 			(at 62.23 41.27 90)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-16-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 58.42 39.37 0)
 			(effects
 				(font
@@ -2676,7 +2676,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C51889750"
+		(property "LCSC" "C964855"
 			(at 58.42 39.37 0)
 			(effects
 				(font
@@ -2704,13 +2704,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify right)))
-		(property "Value" "+ plate"
+		(property "Value" "+ leaf"
 			(at 62.23 66.67 90)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify right)))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-15-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 58.42 64.77 0)
 			(effects
 				(font
@@ -2722,7 +2722,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C51889749"
+		(property "LCSC" "C964855"
 			(at 58.42 64.77 0)
 			(effects
 				(font
@@ -2768,13 +2768,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "+ plate"
+		(property "Value" "+ leaf"
 			(at 87.63 41.27 90)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-15-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 83.82 39.37 0)
 			(effects
 				(font
@@ -2786,7 +2786,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C51889749"
+		(property "LCSC" "C964855"
 			(at 83.82 39.37 0)
 			(effects
 				(font
@@ -2814,13 +2814,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify right)))
-		(property "Value" "- spring"
+		(property "Value" "- leaf"
 			(at 87.63 66.67 90)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify right)))
-		(property "Footprint" "bbase:MYOUNG_MY-AAA-16-J"
+		(property "Footprint" "bbase:MYOUNG_MY-AAA-01"
 			(at 83.82 64.77 0)
 			(effects
 				(font
@@ -2832,7 +2832,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C51889750"
+		(property "LCSC" "C964855"
 			(at 83.82 64.77 0)
 			(effects
 				(font
@@ -3269,30 +3269,30 @@
 				(size 1 1))
 			(justify left bottom))
 		(uuid "8cfa7f7c-d9cf-559b-baee-31386dc0b7a1"))
-	(text "Three AAA cells in series. Contacts: MYOUNG MY-AAA-15-J (+ plate)"
+	(text "Three AAA cells in series. Contacts: six MYOUNG MY-AAA-01 leaf"
 		(exclude_from_sim no)
 		(at 20.32 91.44 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "0212abf5-8534-518b-9286-ed372f40216a"))
-	(text "and MY-AAA-16-J (- spring), tabs soldered in PCB slots (THT), on the"
+		(uuid "61721832-855b-5678-b040-84f56417f416"))
+	(text "contacts (THT, two pins each) on the PCB's back side; the cells lie"
 		(exclude_from_sim no)
 		(at 20.32 93.98 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "779c0c7e-508e-503b-8aba-62fdd59a6fdb"))
-	(text "PCB's back side, leaning on the printed cradle. Spring = minus end."
+		(uuid "71787021-9074-5adc-b672-76a57c07c9d3"))
+	(text "on their feet. Polarity is printed on the PCB under each cell."
 		(exclude_from_sim no)
 		(at 20.32 96.52 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "39b35cf2-f089-5411-b0b2-689acaef94ff"))
+		(uuid "8879d5bd-5e32-513b-81f3-5f88bc0512fc"))
 	(text "Q1: reverse-polarity protection (pack in backwards)."
 		(exclude_from_sim no)
 		(at 20.32 99.06 0)
