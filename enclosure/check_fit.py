@@ -85,12 +85,16 @@ def cell_set(d, xs):
     return w(out)
 
 
-# tolerances: three thick cells rolled left (cell 1 against the thin wall, touching each other), and a thin cell 3
-# against the cradle stop, over the header's tails
+# tolerances: three thick cells rolled left and rolled right as far as they can go (the cradle's bars between the
+# cells keep each cell in its own lane: cell 1 against the thin wall or bar 1, cells 2 and 3 against the bar to their
+# left or right, cell 3 against the stop), and a thin cell 3 against the cradle stop, over the header's tails
 _dm, _dn = K.AAA_D_MAX, K.AAA_D_MIN
-thick_left = cell_set(_dm, [K.X_LEFT + _dm / 2 + 0.01 + k * (_dm + 0.01) for k in range(3)])
+_rr = K._bar_reach(_dm / 2) + K.BAR_W / 2 + 0.01
+thick_left = cell_set(_dm, [K.X_LEFT + _dm / 2 + 0.01] + [xb + _rr for xb in K.BAR_X])
+thick_right = cell_set(_dm, [xb - _rr for xb in K.BAR_X] + [K.X_STOP - _dm / 2 - 0.01])
 thin_right = cell_set(_dn, [K.X_STOP - _dn / 2 - 0.01])
-for an, a in ((f"{_dm} mm cells rolled left", thick_left), (f"{_dn} mm cell 3 against the stop", thin_right)):
+for an, a in ((f"{_dm} mm cells rolled left", thick_left), (f"{_dm} mm cells rolled right", thick_right),
+              (f"{_dn} mm cell 3 against the stop", thin_right)):
     for bn, b in (("tray", tray), ("lid", lid), ("cradle", cradle), ("header", hdr)):
         chk(an, a, bn, b)
 

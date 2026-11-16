@@ -168,6 +168,7 @@ def sim_cycle():
         ax.plot(t, v5, label="boost out [V]", alpha=0.6)
         ax.plot(t, vc, label="cells [V]", ls="--")
         ax2 = ax.twinx()
+        ax.right_ax = ax2
         ax2.plot(t, ichg, color="k", lw=0.8, label="charge current [mA]")
         ax2.set_ylim(0, 130)
         ax2.set_ylabel("mA")
@@ -179,7 +180,9 @@ def sim_cycle():
         stops = int(np.sum(np.diff(on.astype(int)) == -1))
         t_on = float(np.sum(np.diff(t)[on[:-1]]))
         rows.append((title, starts, stops, round(t_on, 2), round(float(lipo[-1]), 3), bool(on[-1])))
-    axs[0].legend(loc="lower right", fontsize=8, ncol=4)
+    h1, l1 = axs[0].get_legend_handles_labels()
+    h2, l2 = axs[0].right_ax.get_legend_handles_labels()  # the charge current, on the right-hand axis
+    axs[0].legend(h1 + h2, l1 + l2, loc="lower right", fontsize=8, ncol=5)
     axs[-1].set_xlabel("time [s] (time-compressed LiPo: one charge takes seconds instead of hours)")
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "charge-control.png"), dpi=110)

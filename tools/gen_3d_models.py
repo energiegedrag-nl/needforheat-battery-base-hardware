@@ -33,8 +33,8 @@ def pin_header():
     p, rows, cols, plastic, pin, tail = 2.54, 8, 2, 2.5, 6.0, 3.0
     body = cq.Workplane("XY").box(cols * p, rows * p, plastic, centered=(True, True, False))
     pts = [((c - 0.5) * p, (r - 3.5) * p) for c in range(cols) for r in range(rows)]
-    pins = cq.Workplane("XY").pushPoints(pts).rect(0.64, 0.64).extrude(plastic + pin).translate((0, 0, -tail + 0.0))
-    pins = pins.union(cq.Workplane("XY").pushPoints(pts).rect(0.64, 0.64).extrude(tail).translate((0, 0, -tail)))
+    # one straight pin per position: tail (-tail..0) through the board, then plastic + mating pin (0..plastic + pin)
+    pins = cq.Workplane("XY").pushPoints(pts).rect(0.64, 0.64).extrude(tail + plastic + pin).translate((0, 0, -tail))
     asm = cq.Assembly(name="PinHeader_2x08")
     asm.add(body.mirror("XZ"), name="body", color=BLACK)
     asm.add(pins.mirror("XZ"), name="pins", color=GOLD)

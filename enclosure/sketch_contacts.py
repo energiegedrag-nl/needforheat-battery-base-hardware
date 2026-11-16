@@ -47,6 +47,9 @@ def top_view(ax):
     ax.add_patch(Rectangle((K.KEY_X - K.KEY_W / 2, WALL + K.CR_CLR - K.KEY_D), K.KEY_W, K.KEY_D, fc=CRADLE, ec=GREY,
                            lw=0.5, hatch="////"))
     ax.add_patch(Rectangle((x1 - K.RAIL_W, K.Y_RIB - 0.5), K.RAIL_W, H - 2 * K.Y_RIB + 1, fc=CRADLE, ec=GREY, lw=0.5))
+    for xb in K.BAR_X:  # low bars between the cells (drawn over the cells: they lie in the wedge under them)
+        ax.add_patch(Rectangle((xb - K.BAR_W / 2, K.Y_RIB - 0.5), K.BAR_W, H - 2 * K.Y_RIB + 1, fc=CRADLE, ec=GREY,
+                               lw=0.5, zorder=3))
     bx, by = K.BUS[0] - K.BUS_W / 2, K.BUS[1] - K.BUS_H / 2
     ax.add_patch(Rectangle((bx, by), K.BUS_W, K.BUS_H, fc="none", ec="black", ls=":", lw=1.0))
     for (px, py) in pins():
@@ -85,6 +88,8 @@ def top_view(ax):
     note(ax, (K.KEY_X, WALL - 0.4), "key: lip on the rib in a groove\nin the top wall (off centre)", W + 2, -5)
     note(ax, (W - WALL - 1, K.SADDLE_Y[1]), "cradle stops right of\ncell 3 (y = " +
          ", ".join(f"{y:g}" for y in K.SADDLE_Y) + ")\nand side rail", W + 2, 20)
+    note(ax, (K.BAR_X[0], 20), f"cradle bars between the cells\n({K.BAR_W:g} x {K.BAR_H:g} mm, rib to rib,\n"
+         "through the gaps between the plates)", -2, 20)
     note(ax, (K.X_LEFT + 0.2, 30), f"left wall {K.WALL_THIN:g} mm thin\nwhere cell 1 bulges", -2, 30)
     note(ax, (bx + 1, by + 3), "2x8 bus header (underside, THT);\nits tails 1.4 mm proud, under cell 3", -2, 42, "black")
     note(ax, (K.PEGS[1][0], K.PEGS[1][1]), "peg moved to (3.6, 50.4):\nclear of cell 1's contact", -2, 51, "#2b8a3e")
@@ -164,27 +169,32 @@ def cross_section(ax):
     x1 = W - WALL - K.CR_CLR
     ax.add_patch(Rectangle((x1 - K.RAIL_W, zp), K.RAIL_W, K.RAIL_H, fc=CRADLE, ec=GREY, hatch="////", lw=0.5))
     ax.add_patch(Rectangle((K.X_STOP, zp), x1 - K.X_STOP, K.STOP_H, fc="none", ec=GREY, lw=0.9, ls="--"))
+    for xb in K.BAR_X:  # low bars between the cells (cut)
+        ax.add_patch(Rectangle((xb - K.BAR_W / 2, zp), K.BAR_W, K.BAR_H, fc=CRADLE, ec=GREY, hatch="////", lw=0.5,
+                               zorder=4))
     # cells: nominal (solid), the tolerance cases (dashed)
     for x in K.CELL_X:
         ax.add_patch(Circle((x, K.AXIS_Z), K.AAA_D / 2, fc=CELL, ec="#b07d2b", alpha=0.85))
         ax.plot([x], [K.AXIS_Z], marker="+", color="#b07d2b")
     dm, dn = K.AAA_D_MAX, K.AAA_D_MIN
-    for k in range(3):
-        ax.add_patch(Circle((K.X_LEFT + dm / 2 + k * dm, zp + dm / 2), dm / 2, fc="none", ec="#e8590c", lw=0.7,
-                            ls=(0, (3, 2))))
+    rr = K._bar_reach(dm / 2) + K.BAR_W / 2  # thick cells rolled left, each in its own lane (wall or bar)
+    for xc in [K.X_LEFT + dm / 2] + [xb + rr for xb in K.BAR_X]:
+        ax.add_patch(Circle((xc, zp + dm / 2), dm / 2, fc="none", ec="#e8590c", lw=0.7, ls=(0, (3, 2))))
     ax.add_patch(Circle((K.X_STOP - dn / 2, zp + dn / 2), dn / 2, fc="none", ec="#5f3dc4", lw=0.7, ls=(0, (3, 2))))
     ax.set_xlim(-14, W + 16); ax.set_ylim(-3, K.Z_LID + 1.2); ax.set_aspect("equal"); ax.axis("off")
     note(ax, (K.X_LEFT + 0.3, K.AXIS_Z), f"left wall {K.WALL_THIN:g} mm\n(else {WALL:g}) where\ncell 1 bulges", -1.5,
          K.AXIS_Z + 1.0)
-    note(ax, (K.CELL_X[0] - 3.5, zp + 1), "cells lie on the PCB;\nno saddles or arcs:\nthey can roll left", -1.5,
+    note(ax, (K.CELL_X[0] - 3.5, zp + 1), "cells lie on the PCB;\nno saddles or arcs:\neach rolls in its lane", -1.5,
          zp + 1.5)
     note(ax, (K.CELL_X[0] - 2, zp + K.CONTACT_C + 2), "plates at the bottom end\n(behind): spring / button\n"
          "on the contact centre", -1.5, K.Z_LID - 0.3, RED)
     note(ax, (x1 - 0.6, zp + 3.5), f"cradle side rail\nand stop at x = {K.X_STOP:.2f}\n(dashed: behind, y = 48)",
          W + 1.5, zp + 7.5)
+    note(ax, (K.BAR_X[1] + K.BAR_W / 2, zp + K.BAR_H - 0.3), f"cradle bars ({K.BAR_W:g} x {K.BAR_H:g} mm), cut,\n"
+         "in the wedge under two cells", W + 1.5, zp + 4.3)
     note(ax, (K.BUS[0] + 1.27, zp + K.HDR_TAIL), "header tails 1.4 mm proud,\nsolder fillets", W + 1.5, zp + 1.0,
          "black")
-    note(ax, (K.CELL_X[0] - 4.2, K.AXIS_Z + 3.5), f"dashed orange: {dm:g} mm cells\nrolled left (they fit)",
+    note(ax, (K.CELL_X[0] - 4.2, K.AXIS_Z + 3.5), f"dashed orange: {dm:g} mm cells rolled\nleft, each in its lane",
          -1.5, K.AXIS_Z + 4.8, "#e8590c")
     note(ax, (K.X_STOP - dn / 2 + 3, zp + dn - 1.5), f"dashed purple: a {dn:g} mm cell 3\nagainst the stop", W + 1.5,
          K.Z_LID - 1.5, "#5f3dc4")
@@ -225,7 +235,7 @@ def main():
     ax = fig.add_axes([0.77, 0.42, 0.22, 0.22]); ax.axis("off")
     ax.text(0, 1, f"Cells: {K.AAA_D_MIN:g}–{K.AAA_D_MAX:g} mm thick,\n  {K.AAA_L_MIN:g}–{K.AAA_L_MAX:g} mm long\n"
             f"Axes x = {', '.join(f'{x:.2f}' for x in K.CELL_X)}\n"
-            f"Play: {K.CELL_FREE:.2f} mm ({K.X_STOP - K.X_LEFT - 3 * K.AAA_D_MAX:.2f} with\n  {K.AAA_D_MAX:g} mm cells)\n"
+            f"Play: {K.CELL_FREE:.2f} mm ({K.X_STOP - K.X_LEFT - 3 * K.AAA_D_MAX:.2f} with\n  {K.AAA_D_MAX:g} mm cells),\n  split over three lanes by the bars\n"
             f"Springs: {K.SPRING_RANGE[0]:.1f}–{K.SPRING_RANGE[1]:.1f} mm; a {K.AAA_L_MAX:g} mm\n"
             f"  cell goes in with {K.INSERT_MARGIN:.1f} mm to spare\n\n"
             "Contacts (VERIFY with samples):\n"

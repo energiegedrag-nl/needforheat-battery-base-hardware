@@ -163,6 +163,30 @@ assert all(y + SADDLE_W / 2 + 0.3 < HDR_Y[0] or y - SADDLE_W / 2 - 0.3 > HDR_Y[1
 # one side rail, along the right long wall, ties the ribs and stops together. No rail on the left: cell 1's plates
 # reach to 0.4 mm from the wall there.
 RAIL_W, RAIL_H = 1.5, 4.0
+# two low bars on the PCB between the cells (1-2 and 2-3), from rib to rib: they tie the end ribs together on the
+# left part of the cradle, where a rail along the wall does not fit. They run through the gaps between the contact
+# plates of neighbouring cells and lie in the wedge under two round cells, so they are not in the way when a cell
+# goes in. A cell lying on the PCB, rolled against a bar, must still lie flat: checked for the cell sizes and the
+# cells pushed against the wall or the stop.
+BAR_W, BAR_H = 1.4, 2.0
+BAR_X = [(CELL_X[k] + CELL_X[k + 1]) / 2 for k in range(2)]
+BAR_PLATE_CLR = 0.2  # bar to the edge of a contact plate (plates 9.0 wide, VERIFY tolerance)
+for _xb in BAR_X:
+    assert (CELL_PITCH - PLATE_W) / 2 - BAR_W / 2 >= BAR_PLATE_CLR - 1e-6, "bar on a contact plate"
+
+
+def _bar_reach(r):
+    """Horizontal distance from a cell's axis to the top corner of a bar it touches (cell on the PCB)."""
+    return (r * r - (r - BAR_H) ** 2) ** 0.5
+
+
+for _d in (AAA_D_MIN, AAA_D, AAA_D_MAX):
+    _r = _d / 2
+    # left of bar 1: cell 1 against the wall; right of bar 1: cells 2 and 3 against the stop
+    assert BAR_X[0] - BAR_W / 2 >= X_LEFT + _r + _bar_reach(_r) - 1e-6, f"cell {_d}: no room left of bar 1"
+    assert BAR_X[0] + BAR_W / 2 <= X_STOP - 3 * _r - _bar_reach(_r) + 1e-6, f"cell {_d}: no room right of bar 1"
+    assert BAR_X[1] - BAR_W / 2 >= X_LEFT + 3 * _r + _bar_reach(_r) - 1e-6, f"cell {_d}: no room left of bar 2"
+    assert BAR_X[1] + BAR_W / 2 <= X_STOP - _r - _bar_reach(_r) + 1e-6, f"cell {_d}: no room right of bar 2"
 # key: a lip on the top rib, off centre, in a vertical groove in the tray's top wall (open at the top, where the
 # cradle drops in). Turned 180 deg about any axis, the lip lands where there is no groove and the cradle does not go
 # in. Clear of the click dimple in the middle of the top wall.
@@ -371,7 +395,8 @@ def contacts():
 
 
 def cradle():
-    """Printed insert on the PCB: end ribs behind the contact plates, stops right of cell 3, side rails."""
+    """Printed insert on the PCB: end ribs behind the contact plates, stops right of cell 3, a side rail and two low
+    bars between the cells."""
     inside = slab(CI_W, CI_H, CI_R, Z_PCB, RIB_TOP, -WALL - CR_CLR)
     x0, x1 = WALL + CR_CLR, CI_W - WALL - CR_CLR
     body = inside.intersect(box(x0 - 1, x1 + 1, 0, Y_RIB, Z_PCB, RIB_TOP)).union(
@@ -379,6 +404,8 @@ def cradle():
     for y in SADDLE_Y:
         body = body.union(box(X_STOP, x1, y - SADDLE_W / 2, y + SADDLE_W / 2, Z_PCB, Z_PCB + STOP_H))
     body = body.union(box(x1 - RAIL_W, x1, Y_RIB - 0.5, CI_H - Y_RIB + 0.5, Z_PCB, Z_PCB + RAIL_H))
+    for xb in BAR_X:  # low bars between the cells, rib to rib
+        body = body.union(box(xb - BAR_W / 2, xb + BAR_W / 2, Y_RIB - 0.5, CI_H - Y_RIB + 0.5, Z_PCB, Z_PCB + BAR_H))
     # key: lip on the top rib, into the groove in the top wall
     body = body.union(box(KEY_X - KEY_W / 2, KEY_X + KEY_W / 2, WALL + CR_CLR - KEY_D, WALL + CR_CLR + 0.01,
                           Z_PCB + 0.3, RIB_TOP))
@@ -418,6 +445,8 @@ def pcb_constraints():
     back += [dict(what="cradle stop (right of cell 3)", x=[X_STOP, x1], y=[y - SADDLE_W / 2, y + SADDLE_W / 2])
              for y in SADDLE_Y]
     back += [dict(what="cradle side rail", x=[x1 - RAIL_W, x1], y=[Y_RIB - 0.5, CI_H - Y_RIB + 0.5])]
+    back += [dict(what="cradle bar between cells", x=[xb - BAR_W / 2, xb + BAR_W / 2], y=[Y_RIB - 0.5, CI_H - Y_RIB + 0.5])
+             for xb in BAR_X]
     under = []
     for (x, y) in LEGO_HOLES:
         bx = (INSET, x + POST / 2) if x < CI_W / 2 else (x - POST / 2, CI_W - INSET)

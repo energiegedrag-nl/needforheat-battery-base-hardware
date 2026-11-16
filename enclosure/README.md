@@ -36,9 +36,13 @@ their contacts on the **back side** (towards the lid).
   cell and section A–A across the cells, through the header.
 * **Cradle** (`battery-base-cradle`, a third print): drops in on top of the PCB. End ribs (1.2 mm) back the contact
   plates (the spring force goes into the tray's short walls); three stops right of cell 3 (y = 14, 25.5 and 48, clear
-  of the bus header's pins) keep it off the header's tails; one side rail along the right wall. No saddles or arcs
-  under or between the cells: they lie on the PCB and can roll left into the play (1.15 mm with 10.5 mm cells,
-  0.55 mm with 10.7 mm cells) while they go in. **Keyed:** a lip on the top rib (3 mm wide, at x = 30, off centre)
+  of the bus header's pins) keep it off the header's tails; one side rail along the right wall. Two low bars
+  (1.4 mm wide, 2.0 mm high) between cells 1–2 and 2–3 tie the end ribs together on the left, where a rail along the
+  wall does not fit (cell 1's plates come to 0.4 mm from the wall): they run through the 1.9 mm gaps between the
+  contact plates of neighbouring cells and lie in the wedge under two round cells, so a cell going in lies flat on
+  the PCB beside them. Each cell keeps its own play between the bars (at least 0.47 mm for 10.7 mm cells, 0.62 mm
+  each side for nominal cells; `kuip.py` asserts this; [picture](../docs/images/cradle-bars.png)). No saddles or arcs
+  under the cells: they lie on the PCB. **Keyed:** a lip on the top rib (3 mm wide, at x = 30, off centre)
   drops into a vertical groove in the tray's top wall; turned 180° about any axis, the lip lands on the wall and the
   cradle does not go in (`check_fit.py` checks all three). The PCB's keep-outs (both sides), contact and cell
   positions are in [`pcb_constraints.json`](pcb_constraints.json).
@@ -68,6 +72,19 @@ Height: 17.3 mm above the surface it stands on (the CoreInk's back or the lid of
 **Shipping:** modules ship loose (not stacked) in a PostNL letterbox parcel (max. 38 × 26.5 × 3.2 cm), without
 cells. Each module must stay ≤ 27 mm thick from the lid top to the tips of its LEGO posts (≥ 5 mm left for box and
 padding); `kuip.py` asserts this. BatteryBASE: 24.3 mm.
+
+**Print orientation:**
+* **MJF** (JLC3DP, PA12, the intended process): no orientation to choose. It is a powder bed without supports;
+  JLC3DP places the parts to fill the build volume. Bump, tongue and tab print in any orientation.
+* **FDM** (PETG): the lid with its **outside down** on the bed. Inside down does not work: the click bump stands
+  0.4 mm proud of the underside. Outside down gives a smooth outer face with crisp engraved arrows and text, the bump
+  ends up on top, and the tongue's 0.7 mm side step is a short overhang that prints without support. The one place
+  that needs support is the thumb recess: the tab (about 10 × 9.5 mm, with its grip ridges) starts 0.7 mm above the
+  bed and is fixed at one end only. Support only in that recess (PETG sticks to its own support: use a support
+  interface material or a generous Z gap). The layers then run parallel to the tab, so it does not break along a
+  layer line when it flexes. The cradle prints as it lies in the tray: its flat underside (ribs, bars, rail and
+  stops all stand on the PCB) on the bed. The tray needs support in FDM in any orientation (LEGO posts below,
+  pegs and the lid's groove above).
 
 ## Assumptions to verify
 
@@ -101,8 +118,9 @@ dimensions, the enclosure is reprinted.
 `check_fit.py`, result in [`fit-check.txt`](fit-check.txt): no collisions inside the BatteryBASE, on a CoreInk or on
 a P1-BASE v3 (current `feature/p1-base-v3` checkout). The lid slides out (upwards) over its whole length without touching the
 tray, the cradle, the contacts or the cells (the flexing tab left out), and a lid turned round stops 1 mm after entering. The header pins reach
-6.0 mm into the bus socket below. Two tolerance cases are checked too: three 10.7 mm cells rolled left against the
-thin wall, and a 10.1 mm cell 3 against the cradle stop, over the header's tails.
+6.0 mm into the bus socket below. Three tolerance cases are checked too: three 10.7 mm cells rolled left and rolled right
+as far as the wall, the bars and the stop let them, and a 10.1 mm cell 3 against the cradle stop, over the header's
+tails.
 
 ## Next: follow the P1-BASE v3 changes of 15 November 2026
 
