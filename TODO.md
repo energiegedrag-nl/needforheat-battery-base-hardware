@@ -6,18 +6,17 @@ design is generated and checked: [README § Developing](README.md#developing).
 
 ## Soon
 
-- [ ] JLCPCB placement preview with **both sides**: the six MY-AAA-01 on the bottom (rotation; add a `JLC_CORR`
-  entry in `tools/export_fab.py` if needed), and the DFM check of the 1.5 mm pins in the 1.6 mm board. Re-quote 5
-  and 10 boards (both sides) for the cost table.
 - [ ] Decide whether the vendor's 3D model of the MY-AAA-01 (`pcb/bbase.3dshapes/MYOUNG_MY-AAA-01.step`, from
   LCSC/EasyEDA, no licence stated) may stay in the repository, or is fetched locally by
   `tools/import_leaf_model.py`.
 - [ ] Verify with datasheets and samples: see [docs/design.md § 7](docs/design.md#7-open-points-to-verify) (TPS3840
   open-drain output above VDD, TPS61023 shutdown current and EN, the MY-AAA-01 pin spacing and spring travel, the
   off-state current of a real board) and [enclosure/README.md](enclosure/README.md#assumptions-to-verify).
-- [ ] Order with the P1-BASE v3 prototype (JLCPCB, around 8 December 2026): PCBA on both sides (5 or 10 boards; the
-  cart still holds the earlier quote with the old contacts: replace it), printed tray, lid and cradle (MJF PA12; the
-  $ 4.52 per set predates the leaf contacts: re-quote).
+- [ ] Order with the P1-BASE v3 prototype (JLCPCB, around 8 December 2026). The cart holds the BatteryBASE as
+  quoted on 16 November 2026: 5 boards, PCBA on both sides (€ 136.51; placement preview checked, the MY-AAA-01
+  corrected with `JLC_CORR`), and one printed set (tray, lid, cradle; $ 4.57). Raise the number of printed sets if
+  more than one board gets an enclosure. Check the DFM result for the 1.5 mm contact pins in the 1.6 mm board after
+  ordering.
 - [ ] After the print: check the leaf contacts with real cells (contact force, the leaf's top clear of the cradle's
   rib), the cradle bars (each cell must lie flat in its lane), the thin left wall, the sliding fit and click. If
   cells rattle under the lid: a strip of felt or soft foam (1–1.5 mm) on the lid's underside between the cradle's end

@@ -39,6 +39,10 @@ JLC_CORR = {
     # XKB 2x8 header: pins along x in the LCSC footprint, along y in ours
     "CoreInk_Bus_2x08_P2.54mm": (0.0, 0.0, 90.0),
     # the inductor is symmetric: no correction
+    # MYOUNG MY-AAA-01 leaf contact (C964855): the LCSC footprint lies along x with its origin between the pins
+    # (outer pin at -5.105, inner at +5.145 mm); ours has its origin on the outer pin and the inner pin along +y.
+    # Bottom side only (checked in the JLCPCB placement preview on 16 November 2026: leaves at the board's ends)
+    "MYOUNG_MY-AAA-01": (0.0, 5.105, 90.0),
 }
 # per value, for parts whose LCSC footprint differs from others in the same package: the TPS3840DL28 (C2066416)
 # lies a quarter turn further than the TPS3840DL35 (C2866251) in the JLCPCB library
@@ -109,6 +113,8 @@ def cpl():
             x, y, rot = float(r["PosX"]), float(r["PosY"]), float(r["Rot"])
             dx, dy, drot = JLC_CORR_VALUE.get(r["Val"], JLC_CORR.get(r["Package"], (0.0, 0.0, 0.0)))
             a = math.radians(rot)
+            if layer == "Bottom":  # a part flipped to the bottom has its footprint's y the other way round
+                dy = -dy
             # offset is in footprint coordinates (y down); the pos file has y up
             x += dx * math.cos(a) + dy * math.sin(a)
             y -= -dx * math.sin(a) + dy * math.cos(a)
