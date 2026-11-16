@@ -1,0 +1,14 @@
+(version 1)
+
+# Fine-pitch ICs (SOT-563 and MSOP-10 at 0.5 mm, VSSOP-8 at 0.65 mm): the library pads of one footprint sit 0.15 mm
+# apart by design (JLCPCB minimum 0.1 mm). Units are required: a bare 0.15 is not read as millimetres.
+(rule "fine_pitch_pads_same_footprint"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Type == 'Pad' && B.Type == 'Pad' && A.Parent == B.Parent"))
+
+# The courtyards of H1-H3 on the electronics side stand for the tray's corner blocks; the outer contacts' tabs come
+# through the PCB above them, into a pocket in each block (enclosure/kuip.py, TAB_POCKET).
+(rule "contact_tab_over_corner_block"
+	(constraint courtyard_clearance)
+	(severity ignore)
+	(condition "A.Reference == 'H*' && B.Reference == 'BC*'"))

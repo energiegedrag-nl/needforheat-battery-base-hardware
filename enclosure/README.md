@@ -19,21 +19,29 @@ their contacts on the **back side** (towards the lid).
 
 * **Tray** (`battery-base-kuip`): outside exactly the CoreInk outline (40 x 56 mm, R3), walls inside it, like the
   P1-BASE v3; four LEGO-compatible posts underneath (7 mm, three crush ribs) at the CoreInk's LEGO holes; corner
-  blocks that carry a 36.3 x 52.3 mm PCB 2.5 mm above the stand-on surface; three pegs at (36, 4), (4, 52), (36, 52)
-  that key the PCB (as on the P1-BASE v3).
+  blocks that carry a 36.3 x 52.3 mm PCB 2.5 mm above the stand-on surface; three pegs at (36, 4), (3.6, 50.4),
+  (36, 52) that key the PCB (the P1-BASE v3 has (4, 52); cell 1's bottom contact stands there here). The left long
+  wall is 1.0 mm thin (else 1.6) from z = 6.1 to 14.3, along the cells, where cell 1 bulges.
 * **PCB underside** (electronics): parts up to 2.2 mm tall in the 2.5 mm under the PCB, single-sided SMD assembly
   (JLCPCB Economic). The bus header is a plain 2x8 male header, pins down, THT (no socket on top: nothing stacks
   behind a BatteryBASE, unlike the P1-BASE's stacking J1).
 * **Cell contacts** (back side): six MYOUNG plates, tabs soldered in PCB slots by JLCPCB (THT; listed as "Wave
   Soldering, Economic and Standard PCBA"): three + plates MY-AAA-15-J (C51889749) and three − springs MY-AAA-16-J
-  (C51889750), linked in series by PCB tracks. The spring is always the minus end. Cell pitch 11.5 mm, cells 0.8 mm
-  above the PCB (axis 6.05 mm), springs compressed to 3.2 mm (4.2 mm with a 43.5 mm cell). [The sketch](../docs/images/sketch-aaa-contacts.png)
-  shows the compartment as built and the options that were dropped (bridge MY-AAA-5214: it fixes the cell axis at
-  7.0 mm above the PCB; leaf contacts; a complete holder).
-* **Cradle** (`battery-base-cradle`, a third print): drops in on top of the PCB. End ribs back the contact plates
-  (the spring force goes into the tray's short walls); three low saddles (y = 14, 25.5 and 48) keep the cells apart and
-  0.8 mm up, both clear of the bus header's pins. The PCB's keep-outs (both sides), contact and cell positions are in
-  [`pcb_constraints.json`](pcb_constraints.json).
+  (C51889750), linked in series by PCB tracks. The spring is always the minus end. The plates stand on the PCB
+  (JLCPCB pushes them home; their contact centre is 4.0 mm above the PCB), so the **cells lie on the PCB** (axis
+  5.25 mm, 1.25 mm above the contact centre). They are packed to the left, away from the bus header, at x = 6.63,
+  17.52 and 28.40: the curve of cell 3 clears the header's tails (1.4 mm proud) by 0.30–0.49 mm (vertically) for
+  cells of 10.1–10.7 mm. Springs compressed to 3.3–4.8 mm for cells of 45.0–43.5 mm.
+  [The sketch](../docs/images/sketch-aaa-contacts.png) shows the compartment as built: top view, a section along a
+  cell and section A–A across the cells, through the header.
+* **Cradle** (`battery-base-cradle`, a third print): drops in on top of the PCB. End ribs (1.2 mm) back the contact
+  plates (the spring force goes into the tray's short walls); three stops right of cell 3 (y = 14, 25.5 and 48, clear
+  of the bus header's pins) keep it off the header's tails; one side rail along the right wall. No saddles or arcs
+  under or between the cells: they lie on the PCB and can roll left into the play (1.15 mm with 10.5 mm cells,
+  0.55 mm with 10.7 mm cells) while they go in. **Keyed:** a lip on the top rib (3 mm wide, at x = 30, off centre)
+  drops into a vertical groove in the tray's top wall; turned 180° about any axis, the lip lands on the wall and the
+  cradle does not go in (`check_fit.py` checks all three). The PCB's keep-outs (both sides), contact and cell
+  positions are in [`pcb_constraints.json`](pcb_constraints.json).
 * **Plugging in and pulling off** with the whole module: the cradle's end ribs reach to 0.1 mm under the lid, so
   the cradle clamps the PCB between the lid and the tray's corner blocks. Pushing on the tray or the lid: tray ->
   grooves -> lid -> ribs -> PCB -> header pins. Pulling on the tray: corner blocks under the PCB -> PCB -> pins.
@@ -55,22 +63,29 @@ their contacts on the **back side** (towards the lid).
 
 ![Lid half open](../docs/images/enclosure-lid-sliding.png)
 
-Height: 17.9 mm above the surface it stands on (the CoreInk's back or the lid of a P1-BASE v3).
+Height: 17.3 mm above the surface it stands on (the CoreInk's back or the lid of a P1-BASE v3).
 
 **Shipping:** modules ship loose (not stacked) in a PostNL letterbox parcel (max. 38 × 26.5 × 3.2 cm), without
 cells. Each module must stay ≤ 27 mm thick from the lid top to the tips of its LEGO posts (≥ 5 mm left for box and
-padding); `kuip.py` asserts this. BatteryBASE: 24.9 mm.
+padding); `kuip.py` asserts this. BatteryBASE: 24.3 mm.
 
 ## Assumptions to verify
 
-1. **Contacts** (from the MYOUNG drawings, not from parts in hand): the 4.0 mm tab of the 15-J / 16-J goes straight
-   through a PCB slot with the plate 1.65 mm above the board (the drawing shows the tab bent 90°, the EasyEDA
-   footprint is a 4.7 x 1.1 slot); the 15-J button stands about 1.1 mm proud, the model uses 0.8 (`BTN_H`); spring
-   free length 10.5 ± 1 (16-J). Order a few loose for the print check.
-2. **Bus header tails** on the back side: at most 0.4 mm proud of the PCB (`HDR_TAIL`, a header with a 2.0 mm PCB
-   tail), under cell 3, 0.31 mm clear of it. A standard 2.5 / 6.0 / 3.0 header (1.4 mm proud) would need the cells
-   about 1 mm higher (`CELL_LIFT`). Choose the part accordingly.
-3. Sliding fit and click (MJF PA12): 0.2 mm play per side (`SL_CLR`), bump 0.4 mm (`DET_H`), tab 1.3 mm thick and
+1. **Contacts** (MYOUNG drawings WD-CP-0243 / 0244, not parts in hand): plate body 9.0 × 8.0 × 0.3, contact centred,
+   a 4.0 mm wide tab 0.8 mm past the body. The drawings show that tab **bent 90°** ("L-type", 4.0 long); the EasyEDA
+   footprint is a 4.7 × 1.1 slot with the plate drawn flat. The model assumes the tab goes straight through the slot,
+   the plate stands on the PCB (contact centre 4.0 mm up) and the tab is trimmed to 1.6 mm under the PCB
+   (`TAB_BELOW`; 2.4 untrimmed). If the tab really is bent, the plate needs a different footprint or a different part:
+   a bent foot behind the plate does not fit the length (1.4 mm of PCB behind each plate). The 15-J button stands
+   about 1.1 mm proud, the model uses 0.8 (`BTN_H`); spring free length 10.54 ± 1, solid about 3.0 mm (16-J,
+   `SPRING_SOLID`). Order a few loose for the print check.
+2. **Cells**: 10.1–10.7 mm thick and 43.5–45.0 mm long are allowed for (`AAA_D_MIN/MAX`, `AAA_L_MIN/MAX`); a
+   45.0 mm cell goes in with 0.3 mm to spare before the spring is solid. Check with a few brands, NiMH included.
+3. **Bus header tails** (XKB X6521WV-2x08H-C60D30, 3.0 mm PCB tail): 1.4 mm proud of the back side, under cell 3,
+   which clears them by its curve (`HDR_CLR` = 0.3 mm vertically for the thinnest cell against the stop; 0.21 mm
+   shortest distance). The stop's position follows from the pins (`X_STOP`).
+4. **Thin wall** (1.0 mm, MJF PA12; about 0.8 mm is the usual minimum): check on the print.
+5. Sliding fit and click (MJF PA12): 0.2 mm play per side (`SL_CLR`), bump 0.4 mm (`DET_H`), tab 1.3 mm thick and
    about 9.5 mm free (`TAB_T`, `TAB_L`). Estimated: about 4 N on the tab's bump, about 6 N to pull the lid open.
    Adjust after a test print.
 
@@ -86,7 +101,8 @@ dimensions, the enclosure is reprinted.
 `check_fit.py`, result in [`fit-check.txt`](fit-check.txt): no collisions inside the BatteryBASE, on a CoreInk or on
 a P1-BASE v3 (current `feature/p1-base-v3` checkout). The lid slides out (upwards) over its whole length without touching the
 tray, the cradle, the contacts or the cells (the flexing tab left out), and a lid turned round stops 1 mm after entering. The header pins reach
-6.0 mm into the bus socket below.
+6.0 mm into the bus socket below. Two tolerance cases are checked too: three 10.7 mm cells rolled left against the
+thin wall, and a 10.1 mm cell 3 against the cradle stop, over the header's tails.
 
 ## Next: follow the P1-BASE v3 changes of 15 November 2026
 

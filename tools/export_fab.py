@@ -28,13 +28,22 @@ CLI = os.environ.get("KICAD_CLI", os.path.expandvars(r"%LOCALAPPDATA%\Programs\K
 # coordinates (mm, y down), drot = rotation to add (degrees, counter-clockwise).
 # Checked in the JLCPCB placement preview (November 2026).
 JLC_CORR = {
-    # pin 1 on the opposite side / a quarter turn in the JLCPCB library (as on the P1-BASE; CHECK in the JLCPCB
-    # placement preview for the parts that are new here: SOT-563, MSOP-10, VSSOP-8, the inductor, the header)
+    # pin 1 on the opposite side / a quarter turn in the JLCPCB library (SOT-23, SOIC-8 and the header as on the
+    # P1-BASE; SOT-563, MSOP-10 and VSSOP-8 checked in the JLCPCB placement preview on 16 November 2026)
     "SOT-23": (0.0, 0.0, 180.0),
     "SOT-23-5": (0.0, 0.0, 180.0),
+    "SOT-563": (0.0, 0.0, 180.0),
+    "MSOP-10_3x3mm_P0.5mm": (0.0, 0.0, 270.0),
+    "VSSOP-8_3x3mm_P0.65mm": (0.0, 0.0, 270.0),
     "SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x3mm": (0.0, 0.0, 270.0),
     # XKB 2x8 header: pins along x in the LCSC footprint, along y in ours
     "CoreInk_Bus_2x08_P2.54mm": (0.0, 0.0, 90.0),
+    # the inductor is symmetric: no correction
+}
+# per value, for parts whose LCSC footprint differs from others in the same package: the TPS3840DL28 (C2066416)
+# lies a quarter turn further than the TPS3840DL35 (C2866251) in the JLCPCB library
+JLC_CORR_VALUE = {
+    "TPS3840DL28": (0.0, 0.0, 270.0),
 }
 
 LAYERS = "F.Cu,B.Cu,F.Paste,B.Paste,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask,Edge.Cuts"
@@ -98,7 +107,7 @@ def cpl():
             if r["Ref"].startswith(("TP", "H")):
                 continue
             x, y, rot = float(r["PosX"]), float(r["PosY"]), float(r["Rot"])
-            dx, dy, drot = JLC_CORR.get(r["Package"], (0.0, 0.0, 0.0))
+            dx, dy, drot = JLC_CORR_VALUE.get(r["Val"], JLC_CORR.get(r["Package"], (0.0, 0.0, 0.0)))
             a = math.radians(rot)
             # offset is in footprint coordinates (y down); the pos file has y up
             x += dx * math.cos(a) + dy * math.sin(a)

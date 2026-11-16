@@ -41,12 +41,14 @@ VIEWS = [
         ((CX - 8.0, YT, ZT + 1.0), "Open end at the top edge: the lid slides in from here\nand stops against the bottom wall"),
         ((36.0, -4.0, K.GAP + K.PCB_T - 0.2), "Peg in a corner block (3x): keys the PCB;\nthe top-left block has none"),
         ((K.CI_W, -30.0, 8.0), "Outside flush with the CoreInk (40 x 56 mm, R3)"),
+        ((K.KEY_X, -(K.KEY_Y0 + 0.4), K.Z_TOP - 1.0), "Key groove for the cradle's lip (off centre)"),
     ]),
     ("cradle", "battery-base-cradle.stl", 40, -125, [
         ((K.CI_W / 2, -(K.WALL + K.CR_CLR + K.RIB_T / 2), K.RIB_TOP), "End rib: backs the contact plates; the spring force\ngoes through it into the tray's short wall"),
-        ((K.CELL_X[1], -K.SADDLE_Y[1], K.AXIS_Z - K.AAA_D / 2), f"Saddle (3x): keeps the cells {K.CELL_LIFT} mm above the PCB\nand apart; all three clear of the bus header's pins"),
-        ((K.WALL + K.CR_CLR + 0.5, -30.0, K.Z_PCB + 4.0), "Side rail: ties ribs and saddles together"),
+        ((K.X_STOP, -K.SADDLE_Y[1], K.Z_PCB + K.STOP_H), "Stop (3x) right of cell 3: keeps it off the bus header's\ntails; the cells lie on the PCB, no saddles"),
+        ((K.CI_W - K.WALL - K.CR_CLR - K.RAIL_W / 2, -30.0, K.Z_PCB + K.RAIL_H), "Side rail: ties ribs and stops together"),
         ((K.CI_W - 3.0, -(K.CI_H - 3.0), K.Z_PCB), "Drops in on top of the PCB; the lid keeps it down"),
+        ((K.KEY_X, -(K.WALL + K.CR_CLR - K.KEY_D), K.RIB_TOP - 1.0), "Key: lip on the top rib, off centre, into a groove\nin the top wall; turned round, it does not go in"),
     ]),
     ("lid-underside", "battery-base-lid.stl", -40, 120, [
         ((XR - K.GR_D, -30.0, ZT + K.TONGUE_H / 2), "Tongue along both long sides and the bottom end"),
@@ -60,7 +62,7 @@ VIEWS = [
         ((CX, M(18.0), ZL), "\"3x AAA\""),
     ]),
 ]
-TITLES = {"cradle": "Cradle (separate print): ribs behind the contacts, saddles under the cells",
+TITLES = {"cradle": "Cradle (separate print): ribs behind the contacts, stops beside cell 3",
           "tray-open-end": "Tray, seen from the top edge (lid removed)",
           "lid-underside": "Sliding lid, seen from below (inside)",
           "lid-outside": "Sliding lid, outside (the back of the module)"}

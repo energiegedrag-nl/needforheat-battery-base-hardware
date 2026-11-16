@@ -58,69 +58,69 @@
    ]
   },
   {
-   "what": "+ plate MY-AAA-15-J tab and solder joint",
+   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
    "x": [
-    5.9,
-    11.1
+    4.0337037581539175,
+    9.233703758153919
    ],
    "y": [
-    2.5,
-    4.5
+    2.2,
+    4.2
    ]
   },
   {
-   "what": "- spring MY-AAA-16-J tab and solder joint",
+   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
    "x": [
-    5.9,
-    11.1
+    4.0337037581539175,
+    9.233703758153919
    ],
    "y": [
-    51.5,
-    53.5
+    51.8,
+    53.8
    ]
   },
   {
-   "what": "- spring MY-AAA-16-J tab and solder joint",
+   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
    "x": [
-    17.4,
-    22.6
+    14.917407516307838,
+    20.11740751630784
    ],
    "y": [
-    2.5,
-    4.5
+    2.2,
+    4.2
    ]
   },
   {
-   "what": "+ plate MY-AAA-15-J tab and solder joint",
+   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
    "x": [
-    17.4,
-    22.6
+    14.917407516307838,
+    20.11740751630784
    ],
    "y": [
-    51.5,
-    53.5
+    51.8,
+    53.8
    ]
   },
   {
-   "what": "+ plate MY-AAA-15-J tab and solder joint",
+   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
    "x": [
-    28.9,
-    34.1
+    25.801111274461753,
+    31.001111274461756
    ],
    "y": [
-    2.5,
-    4.5
+    2.2,
+    4.2
    ]
   },
   {
-   "what": "- spring MY-AAA-16-J tab and solder joint",
+   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
    "x": [
-    28.9,
-    34.1
+    25.801111274461753,
+    31.001111274461756
    ],
    "y": [
-    51.5,
-    53.5
+    51.8,
+    53.8
    ]
   }
  ],
@@ -134,7 +134,7 @@
    ],
    "y": [
     1.85,
-    3.25
+    2.95
    ]
   },
   {
@@ -144,14 +144,14 @@
     38.25
    ],
    "y": [
-    52.75,
+    53.05,
     54.15
    ]
   },
   {
-   "what": "cradle saddle",
+   "what": "cradle stop (right of cell 3)",
    "x": [
-    1.75,
+    33.651111274461755,
     38.25
    ],
    "y": [
@@ -160,9 +160,9 @@
    ]
   },
   {
-   "what": "cradle saddle",
+   "what": "cradle stop (right of cell 3)",
    "x": [
-    1.75,
+    33.651111274461755,
     38.25
    ],
    "y": [
@@ -171,9 +171,9 @@
    ]
   },
   {
-   "what": "cradle saddle",
+   "what": "cradle stop (right of cell 3)",
    "x": [
-    1.75,
+    33.651111274461755,
     38.25
    ],
    "y": [
@@ -184,23 +184,12 @@
   {
    "what": "cradle side rail",
    "x": [
-    1.75,
-    2.75
-   ],
-   "y": [
-    2.75,
-    53.25
-   ]
-  },
-  {
-   "what": "cradle side rail",
-   "x": [
-    37.25,
+    36.75,
     38.25
    ],
    "y": [
-    2.75,
-    53.25
+    2.45,
+    53.55
    ]
   }
  ],
@@ -216,13 +205,13 @@
   {
    "part": "+ plate MY-AAA-15-J",
    "end": "top",
-   "x": 8.5,
-   "y_plate_centre": 3.5,
+   "x": 6.633703758153918,
+   "y_plate_centre": 3.2,
    "width": 9.0,
-   "tab": "4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
    "contacts": [
     {
-     "x": 8.5,
+     "x": 6.633703758153918,
      "polarity": "+"
     }
    ]
@@ -230,13 +219,13 @@
   {
    "part": "- spring MY-AAA-16-J",
    "end": "bottom",
-   "x": 8.5,
-   "y_plate_centre": 52.5,
+   "x": 6.633703758153918,
+   "y_plate_centre": 52.8,
    "width": 9.0,
-   "tab": "4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
    "contacts": [
     {
-     "x": 8.5,
+     "x": 6.633703758153918,
      "polarity": "-"
     }
    ]
@@ -244,13 +233,13 @@
   {
    "part": "- spring MY-AAA-16-J",
    "end": "top",
-   "x": 20.0,
-   "y_plate_centre": 3.5,
+   "x": 17.517407516307838,
+   "y_plate_centre": 3.2,
    "width": 9.0,
-   "tab": "4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
    "contacts": [
     {
-     "x": 20.0,
+     "x": 17.517407516307838,
      "polarity": "-"
     }
    ]
@@ -258,13 +247,13 @@
   {
    "part": "+ plate MY-AAA-15-J",
    "end": "bottom",
-   "x": 20.0,
-   "y_plate_centre": 52.5,
+   "x": 17.517407516307838,
+   "y_plate_centre": 52.8,
    "width": 9.0,
-   "tab": "4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
    "contacts": [
     {
-     "x": 20.0,
+     "x": 17.517407516307838,
      "polarity": "+"
     }
    ]
@@ -272,13 +261,13 @@
   {
    "part": "+ plate MY-AAA-15-J",
    "end": "top",
-   "x": 31.5,
-   "y_plate_centre": 3.5,
+   "x": 28.401111274461755,
+   "y_plate_centre": 3.2,
    "width": 9.0,
-   "tab": "4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
    "contacts": [
     {
-     "x": 31.5,
+     "x": 28.401111274461755,
      "polarity": "+"
     }
    ]
@@ -286,13 +275,13 @@
   {
    "part": "- spring MY-AAA-16-J",
    "end": "bottom",
-   "x": 31.5,
-   "y_plate_centre": 52.5,
+   "x": 28.401111274461755,
+   "y_plate_centre": 52.8,
    "width": 9.0,
-   "tab": "4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
    "contacts": [
     {
-     "x": 31.5,
+     "x": 28.401111274461755,
      "polarity": "-"
     }
    ]
@@ -300,18 +289,18 @@
  ],
  "cells": [
   {
-   "x": 8.5,
-   "y_top": 4.55,
+   "x": 6.633703758153918,
+   "y_top": 4.25,
    "plus_end": "top"
   },
   {
-   "x": 20.0,
-   "y_top": 6.95,
+   "x": 17.517407516307838,
+   "y_top": 7.25,
    "plus_end": "bottom"
   },
   {
-   "x": 31.5,
-   "y_top": 4.55,
+   "x": 28.401111274461755,
+   "y_top": 4.25,
    "plus_end": "top"
   }
  ],
@@ -321,8 +310,8 @@
    4
   ],
   [
-   4,
-   52
+   3.6,
+   50.4
   ],
   [
    36,

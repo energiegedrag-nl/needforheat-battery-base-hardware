@@ -492,7 +492,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "needforheat-p1-base-hardware.kicad_pro",
+    "filename": "needforheat-battery-base-hardware.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -650,8 +650,8 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "needforheat-p1-base-hardware.kicad_sch",
-        "name": "needforheat-p1-base-hardware",
+        "filename": "needforheat-battery-base-hardware.kicad_sch",
+        "name": "needforheat-battery-base-hardware",
         "uuid": "00000000-0000-0000-0000-000000000000"
       }
     ]

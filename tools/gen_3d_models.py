@@ -5,7 +5,8 @@ Adapted from tools/gen_3d_models.py of needforheat-p1-base-hardware.
 - 2x8 2.54 mm male pin header XKB X6521WV-2x08H-C60D30 (C706898): 2.5 mm plastic on the board, 6.0 mm pins above
   it, 3.0 mm tails through the board.
 - MYOUNG MY-AAA-15-J (+ plate, 1.43 mm button) and MY-AAA-16-J (- plate with spring, shown compressed as in the
-  enclosure): 9.0 x 8.8 x 0.3 mm plate standing PLATE_Z0 above the board, 4.0 mm tab down through the board.
+  enclosure): 9.0 x 8.0 x 0.3 mm plate standing on the board, its 4.0 mm wide tab down through the board and
+  trimmed (TAB_BELOW).
   Heights and the compressed spring length come from enclosure/kuip.py.
 
 Models are approximations for renders and fit checks. Origin = footprint origin, z = 0 at the board surface on the
@@ -41,11 +42,11 @@ def pin_header():
 
 
 def plate(plus):
-    z0, h, w, t = K.PLATE_Z0, K.SINGLE_H, K.SINGLE_W, 0.3
-    zc = z0 + h / 2
+    z0, h, w, t = 0.0, K.PLATE_BODY, K.PLATE_W, 0.3
+    zc = K.CONTACT_C
     body = cq.Workplane("XY").box(w, t, h, centered=(True, True, False)).translate((0, 0, z0))
-    tab = cq.Workplane("XY").box(4.0, t, K.SINGLE_TAB, centered=(True, True, False)).translate(
-        (0, 0, z0 - K.SINGLE_TAB + 0.01))
+    below = K.PCB_T + K.TAB_BELOW  # tab through the board, trimmed
+    tab = cq.Workplane("XY").box(4.0, t, below, centered=(True, True, False)).translate((0, 0, z0 - below + 0.01))
     metal = body.union(tab)
     if plus:  # button facing +y (footprint frame)
         button = (cq.Workplane("XZ").workplane(offset=-t / 2).center(0, zc).circle(2.0).extrude(-(K.BTN_H)))

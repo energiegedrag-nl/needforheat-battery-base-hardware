@@ -74,6 +74,26 @@ for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells)):
 chk("header (tails on top)", hdr, "cells", cells)
 chk("header (tails on top)", hdr, "contacts", cont)
 
+
+def cell_set(d, xs):
+    """Cells of diameter d lying on the PCB at the given axes, nominal length, at the nominal y."""
+    out = None
+    for i, x in enumerate(xs):
+        c = cq.Workplane("XY").add(cq.Solid.makeCylinder(d / 2, K.AAA_L, cq.Vector(x, -K.cell_y0(i), K.Z_PCB + d / 2),
+                                                          cq.Vector(0, -1, 0)))
+        out = c if out is None else out.union(c)
+    return w(out)
+
+
+# tolerances: three thick cells rolled left (cell 1 against the thin wall, touching each other), and a thin cell 3
+# against the cradle stop, over the header's tails
+_dm, _dn = K.AAA_D_MAX, K.AAA_D_MIN
+thick_left = cell_set(_dm, [K.X_LEFT + _dm / 2 + 0.01 + k * (_dm + 0.01) for k in range(3)])
+thin_right = cell_set(_dn, [K.X_STOP - _dn / 2 - 0.01])
+for an, a in ((f"{_dm} mm cells rolled left", thick_left), (f"{_dn} mm cell 3 against the stop", thin_right)):
+    for bn, b in (("tray", tray), ("lid", lid), ("cradle", cradle), ("header", hdr)):
+        chk(an, a, bn, b)
+
 # the sliding lid: path out towards the top edge (CadQuery +y, K.LID_OUT), and the key against turning it round
 tab = K.lid_mirror(K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,
             K.Z_TOP - 1, K.Z_LID + 1))
@@ -89,6 +109,17 @@ key_in = next((d for d in (0.5, 1.0, 1.5, 2.0)
                if overlap(turned.moved(cq.Location(cq.Vector(0, K.LID_OUT * (K.CI_H - d), 0))).wrapped, tray) > 0.005), None)
 if key_in is None:
     report.append("KEY: a lid turned round enters more than 2 mm")
+
+# the cradle's key: turned 180 deg about any axis (through its centre) it must not drop into the tray
+cr_shape = K.cradle().val()
+cr_c = cq.Vector(K.CI_W / 2, -K.CI_H / 2, (K.Z_PCB + K.RIB_TOP) / 2)
+cradle_key = []
+for ax_name, ax in (("z", (0, 0, 1)), ("x", (1, 0, 0)), ("y", (0, 1, 0))):
+    turned_cr = cr_shape.rotate(cr_c, cr_c + cq.Vector(*ax), 180).wrapped
+    v = overlap(turned_cr, tray)
+    cradle_key.append(f"{ax_name}: {v:.1f} mm3 in the tray")
+    if v < 1.0:
+        report.append(f"KEY: the cradle turned 180 deg about {ax_name} fits the tray")
 
 # 2. on a CoreInk
 core = cq.Workplane("XY").center(K.CI_W / 2, -K.CI_H / 2).rect(K.CI_W, K.CI_H).extrude(-16).edges("|Z").fillet(K.CI_R)
@@ -138,6 +169,7 @@ print("COLLISIONS:", "\n  ".join([""] + report) if report else "none")
 print("closest approach < 0.5 mm:", sorted(clear))
 print(f"lid top {K.Z_TOP + K.LID_T:.1f} mm above the stand-on surface; cells {K.AAA_D} mm, top at z = {K.CELL_TOP:.1f}")
 print(f"sliding lid: slides out freely; turned round it stops after {key_in} mm")
+print("cradle key, turned 180 deg about " + "; ".join(cradle_key))
 print(f"header pins reach {pins_in:.1f} mm below the stand-on surface (CoreInk socket 8.0 mm deep)")
 if p1:
     print(f"on a P1-BASE: its J1 socket top at z = {p1[1]:.2f} (0 = flush with the P1-BASE lid)")

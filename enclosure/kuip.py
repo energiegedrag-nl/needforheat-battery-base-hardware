@@ -13,11 +13,12 @@ lid of a P1-BASE v3, which repeats the CoreInk's back (LEGO holes and a flush 2x
 * A 36.3 x 52.3 mm PCB on corner blocks, 2.5 mm above z = 0, keyed by three pegs (same places as the P1-BASE v3).
   The electronics sit on the PCB's underside, in the 2.5 mm under it (the side that faces the CoreInk or the
   P1-BASE), so a single-sided SMD assembly does; the 2x8 bus header (THT, pins down) is there too.
-* Three AAA cells in series on the PCB's back side, 11.5 mm apart, 0.8 mm above the PCB, between six MYOUNG contact
-  plates soldered in PCB slots by JLCPCB (THT): three + plates MY-AAA-15-J and three - springs MY-AAA-16-J, linked
-  by PCB tracks. The spring is always the minus end.
+* Three AAA cells in series on the PCB's back side, lying on the PCB, packed to the left (away from the bus header's
+  tails, which the cells' curve clears), between six MYOUNG contact plates standing on the PCB in slots, soldered by
+  JLCPCB (THT): three + plates MY-AAA-15-J and three - springs MY-AAA-16-J, linked by PCB tracks. The spring is
+  always the minus end. The left long wall is thinner where cell 1 bulges.
 * A cradle (separate print) on the PCB: end ribs behind the contact plates, which pass the spring force on to the
-  tray's short walls, and two low saddles that keep the cells apart and clear of the bus header's tails.
+  tray's short walls, and three stops right of cell 3 that keep it off the bus header's tails.
   The PCB's keep-outs go to enclosure/pcb_constraints.json.
 * A sliding lid, like a remote control's battery door. It slides in from the top edge (HAT side) and stops against
   the bottom wall, so it stays in when the CoreInk hangs or stands, even without its click; a flexible tab at the
@@ -59,7 +60,9 @@ PEG_D = 2.0
 GAP = 2.5  # stand-on surface -> PCB bottom = plastic of a standard 2x8 male header
 PCB_T = 1.6
 INSET = WALL + CLR  # PCB = CoreInk outline minus INSET on every side: 36.3 x 52.3 mm (as the P1-BASE v3)
-PEGS = [(36, 4), (4, 52), (36, 52)]  # Ø2.2 NPTH in the PCB, as on the P1-BASE v3; the top-left corner keys the PCB
+# Ø2.2 NPTH in the PCB on the corner blocks; the top-left corner keys the PCB. The P1-BASE v3 has (4, 52); here cell
+# 1's bottom contact stands there, so that peg moves up and in (still on its corner block, clear of the plate's slot)
+PEGS = [(36, 4), (3.6, 50.4), (36, 52)]
 HDR_PIN = 6.0  # header pins below the plastic, into the socket below
 # The bus header: a plain 2x8 male pin header, pins down (the BatteryBASE ends the stack, so no socket on top, unlike
 # the P1-BASE's stacking J1), inserted from the underside. Through-hole: its tails stick out on the back side,
@@ -68,58 +71,114 @@ HDR_PIN = 6.0  # header pins below the plastic, into the socket below
 # its feet reach 4.2 mm out from the centre line, past the PCB edge next to the tray wall.
 HDR_TAIL = 3.0 - PCB_T  # 1.4 mm proud of the PCB's back side
 HDR_FILLET = 0.5  # solder fillet around each tail, Ø1.7
+HDR_PIN_W = 0.64  # square pins
 BOTTOM_PART_H = GAP - 0.3  # tallest part on the PCB's underside (it faces the CoreInk's back or the P1-BASE's lid)
-AAA_D, AAA_L = 10.5, 44.5
-AAA_L_MIN = 43.5  # shortest AAA cell to still make contact (IEC LR03: 43.3 to 44.5; VERIFY with real cells)
+AAA_D, AAA_L = 10.5, 44.5  # nominal (IEC LR03: diameter 10.5 max, length 44.5 max)
+# cells as they come (labels, NiMH, manufacturing): the enclosure must take all of these (VERIFY with real cells)
+AAA_D_MIN, AAA_D_MAX = 10.1, 10.7
+AAA_L_MIN, AAA_L_MAX = 43.5, 45.0
 Z_PCB = GAP + PCB_T  # PCB top
 
 # --- cell contacts: six MYOUNG plates, soldered in PCB slots by JLCPCB (THT, wave soldering, Economic PCBA) ------
 # Series chain: - terminal (cell 1, bottom) -> cell 1 -> + top -> PCB -> - top of cell 2 -> cell 2 -> + bottom ->
 # PCB -> - bottom of cell 3 -> cell 3 -> + terminal (cell 3, top).
-# MY-AAA-15-J (C51889749) + plate and MY-AAA-16-J (C51889750) - spring: 9.0 x 8.8 plate, T 0.3, contact centred,
-#   one 4.0 mm wide tab into a PCB slot (VERIFY its shape: the drawing shows it bent 90 deg; the EasyEDA footprint is
-#   a 4.7 x 1.1 slot). The plate stands with its centre on the cell axis; the tab reaches through the PCB.
-# Spring free length 10.5 +/- 1 (16-J).
-CELL_PITCH = 11.5
-CELL_X = [CI_W / 2 - CELL_PITCH, CI_W / 2, CI_W / 2 + CELL_PITCH]
+# MY-AAA-15-J (C51889749) + plate and MY-AAA-16-J (C51889750) - spring, from the MYOUNG drawings WD-CP-0243/0244
+# (2022-12-05): plate body 9.0 wide x 8.0 high x 0.3, contact centred (4.0 from the edge), one 4.0 mm wide tab
+# 0.8 mm past the body (8.8 overall). The drawings show the tab bent 90 deg ("L-type", 4.0 long); the EasyEDA
+# footprint is a 4.7 x 1.1 slot with the plate drawn flat. Assumed here (VERIFY with samples): the tab goes straight
+# through the slot and the plate body stands on the PCB, so its contact centre is CONTACT_C above the PCB. JLCPCB
+# pushes THT parts home, and shaking and gravity would do the same: the plate cannot be set to float above the PCB.
+# Spring free length 10.54 +/- 1 (16-J).
 PLUS_TOP = [True, False, True]  # where each cell's + end is (top = HAT edge)
-CELL_LIFT = 1.6  # cells above the PCB: clear of the bus header's tails and fillets under cell 3 (checked)
+PLATE_W, PLATE_BODY, PLATE_TAB = 9.0, 8.0, 4.0
+CONTACT_C = PLATE_BODY / 2  # contact centre above the PCB
+TAB_BELOW = 1.6  # tab length left under the PCB, trimmed (VERIFY: 4.0 - PCB_T = 2.4 untrimmed)
+PLATE_T = 0.5  # pocket for the plates (0.3 thick)
+# pocket in the tray's corner blocks under each outer contact's tab and its solder joint: width (x), depth (y),
+# height (z); the slot is 4.7 x 1.1 mm
+TAB_POCKET = (5.2, 2.0, TAB_BELOW + 0.4)
+BTN_H = 0.8  # + button height in front of its plate (15-J: 1.43 - 0.3 = about 1.1 per drawing, VERIFY)
+
+# --- cells: lying on the PCB, packed to the left, away from the bus header's tails --------------------------------
+# The cells rest on the PCB (their axis AAA_D / 2 above it, close to the contact centre). The header's tails (1.4 mm
+# proud) are under cell 3; the curve of the cell clears them once the inner pin row is far enough from the cell's
+# axis. A stop in the cradle (right of cell 3) keeps cell 3 there; the long wall on the left is thinner where cell 1
+# bulges (WALL_THIN), so the three cells, with some play, fit between that wall and the stop.
+CELL_LIFT = 0.0
+HDR_CLR = 0.3  # any cell 3 (AAA_D_MIN to AAA_D_MAX, against the stop) above the header's tails
+PIN_X_IN = BUS[0] - 2.54 / 2  # inner pin row, under cell 3
+
+
+def cell_clear_x(r, clr):
+    """Smallest distance from a cell's axis (cell on the PCB, radius r) to the edge of a tail that is HDR_TAIL + clr
+    under the cell's surface."""
+    h = HDR_TAIL + clr
+    return (r * r - (r - h) ** 2) ** 0.5
+
+
+# cradle stop, right of cell 3: set by the cell that gets closest to the tails against it (a thin one)
+X_STOP = min(PIN_X_IN - HDR_PIN_W / 2 - cell_clear_x(d / 2, HDR_CLR) + d / 2
+             for d in (AAA_D_MIN, AAA_D, AAA_D_MAX))
+for _d in (AAA_D_MIN, AAA_D, AAA_D_MAX):  # any cell against the stop: tails' clearance
+    _r = _d / 2
+    _dx = PIN_X_IN - HDR_PIN_W / 2 - (X_STOP - _r)
+    assert _r - (_r * _r - _dx * _dx) ** 0.5 - HDR_TAIL >= HDR_CLR - 1e-6, f"cell {_d} on the header's tails"
+WALL_THIN = 1.0  # long wall on the left where the cells bulge (MJF PA12: about 0.8 minimum, VERIFY)
+X_LEFT = WALL_THIN  # inner face of the thin part
+CELL_FREE = X_STOP - X_LEFT - 3 * AAA_D  # play left for three nominal cells
+assert X_STOP - X_LEFT - 3 * AAA_D_MAX >= 0.2, "three thick cells do not fit"
+CELL_GAP = CELL_FREE / 3  # nominal: the play spread over wall-1, 1-2 and 2-3
+CELL_PITCH = AAA_D + CELL_GAP
+CELL_X = [X_LEFT + CELL_GAP + AAA_D / 2 + k * CELL_PITCH for k in range(3)]  # cell 3 ends against the stop
 CONTACT_Z = CELL_LIFT + AAA_D / 2  # cell axis above the PCB top
 AXIS_Z = Z_PCB + CONTACT_Z
 CELL_TOP = AXIS_Z + AAA_D / 2
-SINGLE_W, SINGLE_H, SINGLE_TAB = 9.0, 8.8, 4.0
-# plate's lower edge above the PCB: centred on the cell axis, but low enough for the tab to stick out 0.5 mm under
-# the PCB for its solder joint (the contact centre then sits up to 0.6 mm under the axis; the + button, Ø4, still
-# covers the cell's + nub, Ø3.8, VERIFY)
-PLATE_Z0 = min(CONTACT_Z - SINGLE_H / 2, SINGLE_TAB - PCB_T - 0.5)
-CONTACT_DROP = CONTACT_Z - (PLATE_Z0 + SINGLE_H / 2)  # contact centre below the cell axis
-assert CONTACT_DROP <= 0.7, f"contact {CONTACT_DROP:.2f} mm under the cell axis"
-assert SINGLE_TAB - PLATE_Z0 > PCB_T + 0.3, "the plate's tab does not reach through the PCB"
-PLATE_T = 0.5  # pocket for the plates (0.3 thick)
-BTN_H = 0.8  # + button height in front of its plate (15-J: 1.43 - 0.3 = about 1.1 per drawing, VERIFY)
+CELL_TOP_MAX = Z_PCB + AAA_D_MAX
+CONTACT_DROP = CONTACT_Z - CONTACT_C  # contact centre below the cell axis
+# the cell's + nub (Ø3.8 max) and the plate's button face (about Ø3.1) still overlap well below 3 mm
+assert CONTACT_DROP <= 1.5, f"contact {CONTACT_DROP:.2f} mm under the cell axis"
 
 # --- cradle: separate printed insert on the PCB ----------------------------------------------------------------
 # End ribs that back the contact plates (the spring force goes through them into the tray's short walls) and two
 # saddle bars that hold the cells CELL_LIFT above the PCB and apart. It drops in on top of the PCB (saddles fixed
 # to the tray walls would block the PCB going in from above) and the lid keeps it down.
 CR_CLR = 0.15  # cradle to the tray walls
-RIB_T = 1.5  # end rib thickness: sets the spring compression
+RIB_T = 1.2  # end rib thickness: sets the spring compression
 Y_RIB = WALL + CR_CLR + RIB_T  # inner face of the top rib = back of the top plates
 Y_FACE = [Y_RIB + PLATE_T, CI_H - Y_RIB - PLATE_T]  # contact faces of the plates, top and bottom
-SPRING_LEN = Y_FACE[1] - Y_FACE[0] - BTN_H - AAA_L  # compressed spring length with a full-length cell
-assert 2.8 <= SPRING_LEN and SPRING_LEN + (AAA_L - AAA_L_MIN) <= 5.0, f"spring {SPRING_LEN:.1f} mm"
-# saddle bars (2 mm wide, keep-out strips on the PCB), all clear of the bus header's pins: two above them and one
-# just below them, near the cells' bottom ends, so the cells cannot wobble
+SPRING_LEN = Y_FACE[1] - Y_FACE[0] - BTN_H - AAA_L  # compressed spring length with a nominal cell
+SPRING_SOLID = 3.0  # 0.6 mm wire, about 5 turns (VERIFY)
+SPRING_RANGE = (SPRING_LEN - (AAA_L_MAX - AAA_L), SPRING_LEN + (AAA_L - AAA_L_MIN))
+assert SPRING_RANGE[0] >= SPRING_SOLID + 0.2 and SPRING_RANGE[1] <= 5.0, f"spring {SPRING_RANGE}"
+# to put a cell in, its - end compresses the spring until its + end drops past the button: the margin left
+INSERT_MARGIN = SPRING_RANGE[0] - SPRING_SOLID
+# cradle stops right of cell 3 (2 mm wide, keep-out strips on the PCB), clear of the bus header's pins: two above
+# them and one just below them. No saddles or arcs under or between the cells: they lie on the PCB and can roll
+# left into the play (CELL_FREE) while they go in.
 SADDLE_Y = [14.0, 25.5, 48.0]
 SADDLE_W = 2.0
+STOP_H = AAA_D_MAX / 2 + 1.5  # above the PCB: past the equator of the thickest cell
 HDR_Y = (BUS[1] - 3.5 * 2.54 - 0.85, BUS[1] + 3.5 * 2.54 + 0.85)  # first and last pin, solder fillets included
-assert all(y + SADDLE_W / 2 + 0.3 < HDR_Y[0] or y - SADDLE_W / 2 - 0.3 > HDR_Y[1] for y in SADDLE_Y), "saddle on the header"
-RAIL_W = 1.0  # side rails along the long walls tie the ribs and saddles together
+assert all(y + SADDLE_W / 2 + 0.3 < HDR_Y[0] or y - SADDLE_W / 2 - 0.3 > HDR_Y[1] for y in SADDLE_Y), "stop on the header"
+# one side rail, along the right long wall, ties the ribs and stops together. No rail on the left: cell 1's plates
+# reach to 0.4 mm from the wall there.
+RAIL_W, RAIL_H = 1.5, 4.0
+# key: a lip on the top rib, off centre, in a vertical groove in the tray's top wall (open at the top, where the
+# cradle drops in). Turned 180 deg about any axis, the lip lands where there is no groove and the cradle does not go
+# in. Clear of the click dimple in the middle of the top wall.
+KEY_X, KEY_W, KEY_D = 30.0, 3.0, 0.8  # centre, width, how far the lip sticks out of the rib
+KEY_CLR = 0.15
+KEY_Y0 = WALL + CR_CLR - KEY_D - KEY_CLR  # groove floor in the top wall
+assert KEY_Y0 >= 0.8 - 1e-6, "top wall too thin behind the key groove"
 
 # --- sliding lid -------------------------------------------------------------------------------------------
 LID_T = 2.0
-Z_TOP = CELL_TOP + 0.5  # lid underside: flat, 0.5 mm above the cells; the lid stops them from jumping out of the
-# saddles. No ribs under the lid: they would hit the bottom wall when the lid slides out.
+Z_TOP = CELL_TOP_MAX + 0.5  # lid underside: flat, 0.5 mm above the thickest cells; it keeps them on the PCB.
+# No ribs under the lid: they would hit the bottom wall when the lid slides out.
+# thin part of the left long wall: where cell 1 can bulge into it, from well under the equator of a thick cell up to
+# 1 mm under the lid's groove (a ledge stays under the groove); over the cells' whole length between the end ribs,
+# so they can slide into the spring
+THIN_Z = (Z_PCB + AAA_D_MAX / 2 - 3.3, Z_TOP - 1.0)
 # Cradle end ribs reach up to just under the lid: the cradle is the clamp between the lid and the PCB. Pushing the
 # module onto the CoreInk: tray -> grooves -> lid tongue -> lid -> ribs -> PCB -> header pins (and pushing on the lid
 # goes straight lid -> ribs). Pulling it off: tray -> corner blocks under the PCB -> header pins. Play in the chain:
@@ -212,9 +271,19 @@ def kuip():
         y0, y1 = (0.0, y + POST / 2) if y < CI_H / 2 else (y - POST / 2, CI_H)
         block = box(x0, x1, y0, y1, 0.0, GAP).intersect(slab(CI_W, CI_H, CI_R, 0.0, GAP))
         body = body.union(block).union(lego_post(x, y, 0.0))
-        if (x, y) in PEGS:
-            body = body.union(cq.Workplane("XY").workplane(offset=GAP).center(*P(x, y)).circle(PEG_D / 2)
-                              .extrude(PCB_T - 0.2))
+    for (x, y) in PEGS:
+        body = body.union(cq.Workplane("XY").workplane(offset=GAP).center(*P(x, y)).circle(PEG_D / 2)
+                          .extrude(PCB_T - 0.2))
+    # thin part of the left long wall, where cell 1 bulges
+    body = body.cut(box(X_LEFT, WALL + 0.01, Y_RIB, CI_H - Y_RIB, THIN_Z[0], THIN_Z[1]))
+    # key groove for the cradle's lip, in the top wall, open at the top
+    assert abs(KEY_X - CI_W / 2) > TAB_W / 2 + KEY_W, "key groove on the click dimple"
+    kx = KEY_W / 2 + KEY_CLR
+    body = body.cut(box(KEY_X - kx, KEY_X + kx, KEY_Y0, WALL + 0.01, Z_PCB, Z_LID + 1))
+    # the outer contacts' tabs come through the PCB above the corner blocks: a pocket for each tab and its solder joint
+    for xc, yp in contact_tabs():
+        body = body.cut(box(xc - TAB_POCKET[0] / 2, xc + TAB_POCKET[0] / 2, yp - TAB_POCKET[1] / 2,
+                            yp + TAB_POCKET[1] / 2, GAP - TAB_POCKET[2], GAP + 0.01))
     # the lid's slot, drawn with the open end at the bottom and mirrored: square ends at the open end (no inner corner
     # radius in the way of the lid), the groove for the lid's tongue, the cap's place on the end wall and its
     # corners, the dimple for the click bump and a lead-in where the bump climbs on
@@ -242,7 +311,7 @@ def lid():
     for k in range(4):
         body = body.union(ridge(CI_H - 3.0 - 1.6 * k, tx0 + 1, tx1 - 1, Z_TOP + TAB_T - 0.01, 0.5, 0.8, up=True))
     body = body.union(ridge(DET_Y, tx0 + 1, tx1 - 1, Z_TOP + 0.01, DET_H + 0.01, DET_B))
-    assert Z_TOP - DET_H > CELL_TOP, "the click bump would rub over the middle cell"  # it slides over it
+    assert Z_TOP - DET_H > CELL_TOP_MAX, "the click bump would rub over the middle cell"  # it slides over it
     # outside: arrow next to the tab pointing the way the lid slides out, and "3x AAA"
     for sx in (tx0 - 5.0, tx1 + 5.0):
         body = body.cut(cq.Workplane("XY").workplane(offset=Z_LID - 0.4).center(*P(sx, CI_H - 6.0))
@@ -269,43 +338,50 @@ def contact_list():
         for end in ("top", "bottom"):
             plus = PLUS_TOP[i] == (end == "top")
             name = "+ plate MY-AAA-15-J" if plus else "- spring MY-AAA-16-J"
-            out.append((name, end, x, SINGLE_W, PLATE_Z0, [(x, "+" if plus else "-")]))
+            out.append((name, end, x, PLATE_W, 0.0, [(x, "+" if plus else "-")]))
     return out
 
 
+def contact_tabs():
+    """(x centre, y of the plate centre) of each contact's tab, in the tray frame."""
+    return [(xc, Y_RIB + PLATE_T / 2 if end == "top" else CI_H - Y_RIB - PLATE_T / 2)
+            for _, end, xc, _, _, _ in contact_list()]
+
+
 def contacts():
-    """Placeholders: plates (0.5 thick), + buttons (BTN_H) and − springs compressed to SPRING_LEN (Ø5)."""
+    """Placeholders: plates (0.5 thick) standing on the PCB with their tab through it, + buttons (BTN_H) and
+    − springs compressed to SPRING_LEN (Ø5), centred CONTACT_C above the PCB."""
     out = None
     for name, end, xc, w, z0, pts in contact_list():
-        h = SINGLE_H
-        if end == "top":
-            plate = box(xc - w / 2, xc + w / 2, Y_RIB, Y_RIB + PLATE_T, Z_PCB + z0, Z_PCB + z0 + h)
-        else:
-            plate = box(xc - w / 2, xc + w / 2, CI_H - Y_RIB - PLATE_T, CI_H - Y_RIB, Z_PCB + z0, Z_PCB + z0 + h)
+        ya, yb = (Y_RIB, Y_RIB + PLATE_T) if end == "top" else (CI_H - Y_RIB - PLATE_T, CI_H - Y_RIB)
+        plate = box(xc - w / 2, xc + w / 2, ya, yb, Z_PCB + z0, Z_PCB + z0 + PLATE_BODY)
+        tab = box(xc - PLATE_TAB / 2, xc + PLATE_TAB / 2, (ya + yb) / 2 - 0.15, (ya + yb) / 2 + 0.15,
+                  GAP - TAB_BELOW, Z_PCB + 0.01)
+        plate = plate.union(tab)
         out = plate if out is None else out.union(plate)
         s = 1 if end == "top" else -1
         yf = Y_FACE[0] if end == "top" else Y_FACE[1]
         for x, pol in pts:
             i = CELL_X.index(x)
             ln = BTN_H if pol == "+" else (cell_y0(i) - yf if end == "top" else yf - cell_y0(i) - AAA_L)
+            # button / spring on the contact centre (CONTACT_C above the PCB), not on the cell axis
             out = out.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(
-                2.0 if pol == "+" else 2.5, ln, cq.Vector(x, -yf, AXIS_Z), cq.Vector(0, -s, 0))))
+                2.0 if pol == "+" else 2.5, ln, cq.Vector(x, -yf, Z_PCB + CONTACT_C), cq.Vector(0, -s, 0))))
     return out
 
 
 def cradle():
-    """Printed insert on the PCB: end ribs behind the contact plates, saddles under the cells, side rails."""
+    """Printed insert on the PCB: end ribs behind the contact plates, stops right of cell 3, side rails."""
     inside = slab(CI_W, CI_H, CI_R, Z_PCB, RIB_TOP, -WALL - CR_CLR)
     x0, x1 = WALL + CR_CLR, CI_W - WALL - CR_CLR
     body = inside.intersect(box(x0 - 1, x1 + 1, 0, Y_RIB, Z_PCB, RIB_TOP)).union(
         inside.intersect(box(x0 - 1, x1 + 1, CI_H - Y_RIB, CI_H, Z_PCB, RIB_TOP)))
     for y in SADDLE_Y:
-        body = body.union(box(x0, x1, y - SADDLE_W / 2, y + SADDLE_W / 2, Z_PCB, AXIS_Z))
-    for xa, xb in ((x0, x0 + RAIL_W), (x1 - RAIL_W, x1)):
-        body = body.union(box(xa, xb, Y_RIB - 0.5, CI_H - Y_RIB + 0.5, Z_PCB, Z_PCB + 4.0))
-    for x in CELL_X:  # cradles for the cells, between the end ribs only (the ribs back the plates over their full face)
-        body = body.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(
-            AAA_D / 2 + 0.15, CI_H - 2 * Y_RIB, cq.Vector(x, -Y_RIB, AXIS_Z), cq.Vector(0, -1, 0))))
+        body = body.union(box(X_STOP, x1, y - SADDLE_W / 2, y + SADDLE_W / 2, Z_PCB, Z_PCB + STOP_H))
+    body = body.union(box(x1 - RAIL_W, x1, Y_RIB - 0.5, CI_H - Y_RIB + 0.5, Z_PCB, Z_PCB + RAIL_H))
+    # key: lip on the top rib, into the groove in the top wall
+    body = body.union(box(KEY_X - KEY_W / 2, KEY_X + KEY_W / 2, WALL + CR_CLR - KEY_D, WALL + CR_CLR + 0.01,
+                          Z_PCB + 0.3, RIB_TOP))
     return body
 
 
@@ -315,6 +391,8 @@ def fit_parts():
            .rect(CI_W - 2 * INSET, CI_H - 2 * INSET).extrude(PCB_T).edges("|Z").fillet(CI_R - INSET + 0.5))
     for (x, y) in PEGS:
         pcb = pcb.cut(cq.Workplane("XY").workplane(offset=GAP - 0.1).center(*P(x, y)).circle(1.1).extrude(PCB_T + 0.2))
+    for xc, yp in contact_tabs():  # the plates' slots (4.3 x 0.6 drill)
+        pcb = pcb.cut(box(xc - 2.15, xc + 2.15, yp - 0.3, yp + 0.3, GAP - 0.1, Z_PCB + 0.1))
     cells = None
     for i, x in enumerate(CELL_X):
         c = cq.Workplane("XY").add(cq.Solid.makeCylinder(
@@ -337,9 +415,9 @@ def pcb_constraints():
     x0, x1 = WALL + CR_CLR, CI_W - WALL - CR_CLR
     back = [dict(what="cradle rib (top)", x=[x0, x1], y=[INSET, Y_RIB]),
             dict(what="cradle rib (bottom)", x=[x0, x1], y=[CI_H - Y_RIB, CI_H - INSET])]
-    back += [dict(what="cradle saddle", x=[x0, x1], y=[y - SADDLE_W / 2, y + SADDLE_W / 2]) for y in SADDLE_Y]
-    back += [dict(what="cradle side rail", x=list(xr), y=[Y_RIB - 0.5, CI_H - Y_RIB + 0.5])
-             for xr in ((x0, x0 + RAIL_W), (x1 - RAIL_W, x1))]
+    back += [dict(what="cradle stop (right of cell 3)", x=[X_STOP, x1], y=[y - SADDLE_W / 2, y + SADDLE_W / 2])
+             for y in SADDLE_Y]
+    back += [dict(what="cradle side rail", x=[x1 - RAIL_W, x1], y=[Y_RIB - 0.5, CI_H - Y_RIB + 0.5])]
     under = []
     for (x, y) in LEGO_HOLES:
         bx = (INSET, x + POST / 2) if x < CI_W / 2 else (x - POST / 2, CI_W - INSET)
@@ -351,9 +429,12 @@ def pcb_constraints():
     for name, end, xc, w, z0, pts in contact_list():
         yp = Y_RIB + PLATE_T / 2 if end == "top" else CI_H - Y_RIB - PLATE_T / 2
         cons.append(dict(part=name, end=end, x=xc, y_plate_centre=round(yp, 3), width=w,
-                         tab="4.0 wide, through a PCB slot, soldered on the underside (VERIFY)",
+                         tab="4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the "
+                             f"underside, trimmed to {TAB_BELOW} mm (VERIFY)",
                          contacts=[dict(x=x, polarity=p) for x, p in pts]))
-        under.append(dict(what=f"{name} tab and solder joint", x=[xc - 2.6, xc + 2.6], y=[yp - 1.0, yp + 1.0]))
+        under.append(dict(what=f"{name} tab and solder joint (pocket in the corner block)",
+                          x=[xc - TAB_POCKET[0] / 2, xc + TAB_POCKET[0] / 2],
+                          y=[yp - TAB_POCKET[1] / 2, yp + TAB_POCKET[1] / 2]))
     return dict(frame="board: x right, y down from the CoreInk outline's top-left corner; the PCB is "
                       f"{CI_W - 2 * INSET:.1f} x {CI_H - 2 * INSET:.1f} from ({INSET}, {INSET})",
                 underside_max_part_height=round(BOTTOM_PART_H, 2), keepout_underside=under,
@@ -389,10 +470,17 @@ def main():
     print("wrote battery-base-fit")
     print(f"thickness for shipping (lid top to post tips): {SHIP_T:.1f} mm (max. {SHIP_MAX} mm)")
     print(f"height above the stand-on surface: {Z_LID:.1f} mm (lid top), cells end at z = {CELL_TOP:.1f}")
-    print(f"cells: pitch {CELL_PITCH} mm, axis {CONTACT_Z:.2f} mm above the PCB, {CELL_LIFT:.2f} mm lift; "
-          f"parts on the PCB's underside up to {BOTTOM_PART_H:.1f} mm")
-    print(f"springs compressed to {SPRING_LEN:.1f} mm ({SPRING_LEN + AAA_L - AAA_L_MIN:.1f} mm with a "
-          f"{AAA_L_MIN} mm cell)")
+    print(f"cells on the PCB at x = {', '.join(f'{x:.2f}' for x in CELL_X)} (pitch {CELL_PITCH:.2f}, play "
+          f"{CELL_FREE:.2f} mm nominal, {X_STOP - X_LEFT - 3 * AAA_D_MAX:.2f} mm with {AAA_D_MAX} mm cells); axis "
+          f"{CONTACT_Z:.2f} mm above the PCB, contact centre {CONTACT_C:.2f} ({CONTACT_DROP:.2f} lower)")
+    print(f"cradle stop at x = {X_STOP:.2f}; left wall {WALL_THIN} mm thin from z = {THIN_Z[0]:.1f} to {THIN_Z[1]:.1f}")
+    for d in (AAA_D_MIN, AAA_D, AAA_D_MAX):
+        r = d / 2
+        dx = PIN_X_IN - HDR_PIN_W / 2 - (X_STOP - r)
+        print(f"  cell {d} mm against the stop: {r - (r * r - dx * dx) ** 0.5 - HDR_TAIL:.2f} mm over the header's tails")
+    print(f"springs compressed to {SPRING_LEN:.1f} mm ({SPRING_RANGE[0]:.1f} to {SPRING_RANGE[1]:.1f} for "
+          f"{AAA_L_MAX} to {AAA_L_MIN} mm cells); putting a {AAA_L_MAX} mm cell in leaves {INSERT_MARGIN:.1f} mm "
+          f"before the spring is solid; parts on the PCB's underside up to {BOTTOM_PART_H:.1f} mm")
 
 
 if __name__ == "__main__":

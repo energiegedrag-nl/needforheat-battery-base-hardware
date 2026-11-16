@@ -53,8 +53,8 @@ FIXED = {
     "J1": (6.03, 36.87, 0),
 }
 # kuip pegs (NPTH) at three of the four LEGO-hole axes, mirrored from the enclosure frame (seen from the back):
-# (36, 4), (4, 52), (36, 52) there. The corner without a peg keys the PCB
-PEGS = [(4.0, 4.0), (36.0, 52.0), (4.0, 52.0)]
+# (36, 4), (3.6, 50.4), (36, 52) there (enclosure/kuip.py PEGS). The corner without a peg keys the PCB
+PEGS = [(4.0, 4.0), (36.4, 50.4), (4.0, 52.0)]
 CORNERS = [(4.0, 4.0), (36.0, 4.0), (4.0, 52.0), (36.0, 52.0)]  # LEGO-hole axes: kuip corner blocks on the top side
 CORNER_BLOCK = 7.0  # the tray's corner blocks reach 7 mm in from the outline corner, on the top side
 # Blocks for the SMD parts (top side): rectangle (x1, y1, x2, y2) and the parts, packed in rows
@@ -242,7 +242,7 @@ def cell_marks(b, cons):
         x = W - cell["x"]
         y0, y1 = cell["y_top"], cell["y_top"] + 44.5
         s = pcbnew.PCB_SHAPE(b, pcbnew.SHAPE_T_RECT)
-        s.SetStart(P(x - 4.0, y0 + 4.0)); s.SetEnd(P(x + 4.0, y1 - 4.0))
+        s.SetStart(P(x - 3.0, y0 + 4.0)); s.SetEnd(P(x + 3.0, y1 - 4.0))  # clear of J1's pads next to cell 3
         s.SetLayer(pcbnew.B_SilkS); s.SetWidth(MM(0.2)); b.Add(s)
         top_plus = cell["plus_end"] == "top"
         nub_y = (y0 + 4.0 - 1.0, y0 + 4.0) if top_plus else (y1 - 4.0, y1 - 4.0 + 1.0)
@@ -351,8 +351,8 @@ def build(route=True):
             it.SetEnd(pcbnew.VECTOR2I(MM(2 * jx - pcbnew.ToMM(e.x)), e.y))
     cell_marks(b, cons)
     add_text(b, "NeedForHeat BatteryBASE v1.0", 20.0, 51.2, 0.9, layer=pcbnew.F_SilkS, bold=True)
-    add_text(b, "energiegedrag.nl - CERN-OHL-P v2", 20.0, 49.6, 0.7, layer=pcbnew.F_SilkS)
-    add_text(b, "3 x AAA - spring = minus", 20.0, 1.0 + INSET + 4.0, 0.9, layer=pcbnew.B_SilkS)
+    add_text(b, "energiegedrag.nl - CERN-OHL-P v2", 20.0, 49.6, 0.8, layer=pcbnew.F_SilkS)
+    add_text(b, "3 x AAA - spring = minus", 20.0, 1.0 + INSET + 3.5, 0.9, layer=pcbnew.B_SilkS)
     for t in b.GetDrawings():
         if isinstance(t, pcbnew.PCB_TEXT) and t.GetLayer() == pcbnew.B_SilkS:
             t.SetMirrored(True)
