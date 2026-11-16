@@ -1,0 +1,343 @@
+{
+ "frame": "board: x right, y down from the CoreInk outline's top-left corner; the PCB is 36.3 x 52.3 from (1.85, 1.85)",
+ "underside_max_part_height": 2.2,
+ "keepout_underside": [
+  {
+   "what": "corner block of the tray (PCB rests on it)",
+   "x": [
+    1.85,
+    7.0
+   ],
+   "y": [
+    1.85,
+    7.0
+   ]
+  },
+  {
+   "what": "corner block of the tray (PCB rests on it)",
+   "x": [
+    33.0,
+    38.15
+   ],
+   "y": [
+    1.85,
+    7.0
+   ]
+  },
+  {
+   "what": "corner block of the tray (PCB rests on it)",
+   "x": [
+    1.85,
+    7.0
+   ],
+   "y": [
+    49.0,
+    54.15
+   ]
+  },
+  {
+   "what": "corner block of the tray (PCB rests on it)",
+   "x": [
+    33.0,
+    38.15
+   ],
+   "y": [
+    49.0,
+    54.15
+   ]
+  },
+  {
+   "what": "bus header body (2x8, 2.5 mm)",
+   "x": [
+    31.43,
+    36.51
+   ],
+   "y": [
+    26.709999999999997,
+    47.03
+   ]
+  },
+  {
+   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
+   "x": [
+    4.0337037581539175,
+    9.233703758153919
+   ],
+   "y": [
+    2.2,
+    4.2
+   ]
+  },
+  {
+   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
+   "x": [
+    4.0337037581539175,
+    9.233703758153919
+   ],
+   "y": [
+    51.8,
+    53.8
+   ]
+  },
+  {
+   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
+   "x": [
+    14.917407516307838,
+    20.11740751630784
+   ],
+   "y": [
+    2.2,
+    4.2
+   ]
+  },
+  {
+   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
+   "x": [
+    14.917407516307838,
+    20.11740751630784
+   ],
+   "y": [
+    51.8,
+    53.8
+   ]
+  },
+  {
+   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
+   "x": [
+    25.801111274461753,
+    31.001111274461756
+   ],
+   "y": [
+    2.2,
+    4.2
+   ]
+  },
+  {
+   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
+   "x": [
+    25.801111274461753,
+    31.001111274461756
+   ],
+   "y": [
+    51.8,
+    53.8
+   ]
+  }
+ ],
+ "back_side": "cells, contacts and cradle only; no parts",
+ "keepout_back": [
+  {
+   "what": "cradle rib (top)",
+   "x": [
+    1.75,
+    38.25
+   ],
+   "y": [
+    1.85,
+    2.95
+   ]
+  },
+  {
+   "what": "cradle rib (bottom)",
+   "x": [
+    1.75,
+    38.25
+   ],
+   "y": [
+    53.05,
+    54.15
+   ]
+  },
+  {
+   "what": "cradle stop (right of cell 3)",
+   "x": [
+    33.651111274461755,
+    38.25
+   ],
+   "y": [
+    13.0,
+    15.0
+   ]
+  },
+  {
+   "what": "cradle stop (right of cell 3)",
+   "x": [
+    33.651111274461755,
+    38.25
+   ],
+   "y": [
+    24.5,
+    26.5
+   ]
+  },
+  {
+   "what": "cradle stop (right of cell 3)",
+   "x": [
+    33.651111274461755,
+    38.25
+   ],
+   "y": [
+    47.0,
+    49.0
+   ]
+  },
+  {
+   "what": "cradle side rail",
+   "x": [
+    36.75,
+    38.25
+   ],
+   "y": [
+    2.45,
+    53.55
+   ]
+  },
+  {
+   "what": "cradle bar between cells",
+   "x": [
+    11.375555637230878,
+    12.775555637230877
+   ],
+   "y": [
+    2.45,
+    53.55
+   ]
+  },
+  {
+   "what": "cradle bar between cells",
+   "x": [
+    22.2592593953848,
+    23.659259395384797
+   ],
+   "y": [
+    2.45,
+    53.55
+   ]
+  }
+ ],
+ "bus_header": {
+  "centre": [
+   33.97,
+   36.87
+  ],
+  "side": "underside, THT, tails on the back side",
+  "max_tail_above_back": 1.4
+ },
+ "contacts": [
+  {
+   "part": "+ plate MY-AAA-15-J",
+   "end": "top",
+   "x": 6.633703758153918,
+   "y_plate_centre": 3.2,
+   "width": 9.0,
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
+   "contacts": [
+    {
+     "x": 6.633703758153918,
+     "polarity": "+"
+    }
+   ]
+  },
+  {
+   "part": "- spring MY-AAA-16-J",
+   "end": "bottom",
+   "x": 6.633703758153918,
+   "y_plate_centre": 52.8,
+   "width": 9.0,
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
+   "contacts": [
+    {
+     "x": 6.633703758153918,
+     "polarity": "-"
+    }
+   ]
+  },
+  {
+   "part": "- spring MY-AAA-16-J",
+   "end": "top",
+   "x": 17.517407516307838,
+   "y_plate_centre": 3.2,
+   "width": 9.0,
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
+   "contacts": [
+    {
+     "x": 17.517407516307838,
+     "polarity": "-"
+    }
+   ]
+  },
+  {
+   "part": "+ plate MY-AAA-15-J",
+   "end": "bottom",
+   "x": 17.517407516307838,
+   "y_plate_centre": 52.8,
+   "width": 9.0,
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
+   "contacts": [
+    {
+     "x": 17.517407516307838,
+     "polarity": "+"
+    }
+   ]
+  },
+  {
+   "part": "+ plate MY-AAA-15-J",
+   "end": "top",
+   "x": 28.401111274461755,
+   "y_plate_centre": 3.2,
+   "width": 9.0,
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
+   "contacts": [
+    {
+     "x": 28.401111274461755,
+     "polarity": "+"
+    }
+   ]
+  },
+  {
+   "part": "- spring MY-AAA-16-J",
+   "end": "bottom",
+   "x": 28.401111274461755,
+   "y_plate_centre": 52.8,
+   "width": 9.0,
+   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
+   "contacts": [
+    {
+     "x": 28.401111274461755,
+     "polarity": "-"
+    }
+   ]
+  }
+ ],
+ "cells": [
+  {
+   "x": 6.633703758153918,
+   "y_top": 4.25,
+   "plus_end": "top"
+  },
+  {
+   "x": 17.517407516307838,
+   "y_top": 7.25,
+   "plus_end": "bottom"
+  },
+  {
+   "x": 28.401111274461755,
+   "y_top": 4.25,
+   "plus_end": "top"
+  }
+ ],
+ "pegs": [
+  [
+   36,
+   4
+  ],
+  [
+   3.6,
+   50.4
+  ],
+  [
+   36,
+   52
+  ]
+ ]
+}

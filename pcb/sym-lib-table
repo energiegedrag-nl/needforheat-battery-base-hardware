@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "bbase")(type "KiCad")(uri "${KIPRJMOD}/bbase.kicad_sym")(options "")(descr "NeedForHeat BatteryBASE symbols"))
+)

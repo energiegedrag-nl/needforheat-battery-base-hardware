@@ -1,2 +1,9 @@
 __pycache__/
 *.pyc
+pcb/*-backups/
+pcb/*.kicad_prl
+pcb/fp-info-cache
+pcb/*.dsn
+pcb/*.ses
+*.rpt
+pcb/~*.lck

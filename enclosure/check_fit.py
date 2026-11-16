@@ -1,7 +1,10 @@
 """Fit check of the BatteryBASE enclosure (CadQuery):
-1. inside the BatteryBASE: tray and lid against the PCB placeholder, the cells and the header;
+1. inside the BatteryBASE: tray, lid and cradle against the PCB placeholder, the contacts, the cells and the
+   header;
 2. on a CoreInk (proxy body: 40 x 56 mm, LEGO through holes, bus socket 8 mm deep, flush);
-3. on a P1-BASE v3: its lid and populated board from a checkout of needforheat-p1-base-hardware
+3. the sliding lid: it slides out over its whole length without touching the tray or the cells (the click tab
+   flexes, so it is left out of this check), and a lid turned round stops within 2 mm of entering;
+4. on a P1-BASE v3: its lid and populated board from a checkout of needforheat-p1-base-hardware
    (enclosure/fabrication/p1-base-lid.step and enclosure/p1-base-v3-pcb.step), moved so that the P1-BASE lid top is
    the stand-on surface (z = 0).
 Usage: python enclosure/check_fit.py [path to needforheat-p1-base-hardware]
@@ -45,6 +48,7 @@ def dist(a, b):
 w = lambda wp: wp.val().wrapped  # noqa: E731
 tray, lid = w(K.kuip()), w(K.lid())
 pcb, cells, hdr = (w(x) for x in K.fit_parts())
+cradle, cont = w(K.cradle()), w(K.contacts())
 report, clear = [], []
 
 
@@ -62,6 +66,64 @@ for an, a in (("tray", tray), ("lid", lid)):
     for bn, b in (("PCB", pcb), ("cells", cells), ("header", hdr)):
         chk(an, a, bn, b)
 chk("tray", tray, "lid", lid)
+# cradle and contacts: the cradle sits on the PCB and backs the plates; buttons and springs touch the cells
+for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells), ("contacts", cont), ("header", hdr)):
+    chk("cradle", cradle, bn, b)
+for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells)):
+    chk("contacts", cont, bn, b)
+chk("header (tails on top)", hdr, "cells", cells)
+chk("header (tails on top)", hdr, "contacts", cont)
+
+
+def cell_set(d, xs):
+    """Cells of diameter d lying on the PCB at the given axes, nominal length, at the nominal y."""
+    out = None
+    for i, x in enumerate(xs):
+        c = cq.Workplane("XY").add(cq.Solid.makeCylinder(d / 2, K.AAA_L, cq.Vector(x, -K.cell_y0(i), K.Z_PCB + d / 2),
+                                                          cq.Vector(0, -1, 0)))
+        out = c if out is None else out.union(c)
+    return w(out)
+
+
+# tolerances: three thick cells rolled left and rolled right as far as they can go (the cradle's bars between the
+# cells keep each cell in its own lane: cell 1 against the thin wall or bar 1, cells 2 and 3 against the bar to their
+# left or right, cell 3 against the stop), and a thin cell 3 against the cradle stop, over the header's tails
+_dm, _dn = K.AAA_D_MAX, K.AAA_D_MIN
+_rr = K._bar_reach(_dm / 2) + K.BAR_W / 2 + 0.01
+thick_left = cell_set(_dm, [K.X_LEFT + _dm / 2 + 0.01] + [xb + _rr for xb in K.BAR_X])
+thick_right = cell_set(_dm, [xb - _rr for xb in K.BAR_X] + [K.X_STOP - _dm / 2 - 0.01])
+thin_right = cell_set(_dn, [K.X_STOP - _dn / 2 - 0.01])
+for an, a in ((f"{_dm} mm cells rolled left", thick_left), (f"{_dm} mm cells rolled right", thick_right),
+              (f"{_dn} mm cell 3 against the stop", thin_right)):
+    for bn, b in (("tray", tray), ("lid", lid), ("cradle", cradle), ("header", hdr)):
+        chk(an, a, bn, b)
+
+# the sliding lid: path out towards the top edge (CadQuery +y, K.LID_OUT), and the key against turning it round
+tab = K.lid_mirror(K.box(K.CI_W / 2 - K.TAB_W / 2 - 0.1, K.CI_W / 2 + K.TAB_W / 2 + 0.1, K.CI_H - K.TAB_L, K.CI_H + 1,
+            K.Z_TOP - 1, K.Z_LID + 1))
+rigid = K.lid().cut(tab).val()
+for s in (0.5, 1, 2, 5, 10, 20, 30, 40, 50, K.CI_H):
+    m = rigid.moved(cq.Location(cq.Vector(0, K.LID_OUT * s, 0))).wrapped
+    for bn, b in (("tray", tray), ("cells", cells), ("cradle", cradle), ("contacts", cont)):
+        v = overlap(m, b)
+        if v > 0.005:
+            report.append(f"COLLISION lid slid out {s} mm x {bn}: {v:.3f} mm3")
+turned = K.lid().val().rotate(cq.Vector(K.CI_W / 2, -K.CI_H / 2, 0), cq.Vector(K.CI_W / 2, -K.CI_H / 2, 1), 180)
+key_in = next((d for d in (0.5, 1.0, 1.5, 2.0)
+               if overlap(turned.moved(cq.Location(cq.Vector(0, K.LID_OUT * (K.CI_H - d), 0))).wrapped, tray) > 0.005), None)
+if key_in is None:
+    report.append("KEY: a lid turned round enters more than 2 mm")
+
+# the cradle's key: turned 180 deg about any axis (through its centre) it must not drop into the tray
+cr_shape = K.cradle().val()
+cr_c = cq.Vector(K.CI_W / 2, -K.CI_H / 2, (K.Z_PCB + K.RIB_TOP) / 2)
+cradle_key = []
+for ax_name, ax in (("z", (0, 0, 1)), ("x", (1, 0, 0)), ("y", (0, 1, 0))):
+    turned_cr = cr_shape.rotate(cr_c, cr_c + cq.Vector(*ax), 180).wrapped
+    v = overlap(turned_cr, tray)
+    cradle_key.append(f"{ax_name}: {v:.1f} mm3 in the tray")
+    if v < 1.0:
+        report.append(f"KEY: the cradle turned 180 deg about {ax_name} fits the tray")
 
 # 2. on a CoreInk
 core = cq.Workplane("XY").center(K.CI_W / 2, -K.CI_H / 2).rect(K.CI_W, K.CI_H).extrude(-16).edges("|Z").fillet(K.CI_R)
@@ -73,7 +135,7 @@ chk("tray", tray, "CoreInk", core)
 chk("header", hdr, "CoreInk", core)
 pins_in = -min(bbox(hdr)[2], 0)
 
-# 3. on a P1-BASE v3
+# 4. on a P1-BASE v3
 p1_lid_f = os.path.join(P1, "enclosure", "fabrication", "p1-base-lid.step")
 p1 = None
 if os.path.exists(p1_lid_f):
@@ -110,6 +172,8 @@ if os.path.exists(p1_lid_f):
 print("COLLISIONS:", "\n  ".join([""] + report) if report else "none")
 print("closest approach < 0.5 mm:", sorted(clear))
 print(f"lid top {K.Z_TOP + K.LID_T:.1f} mm above the stand-on surface; cells {K.AAA_D} mm, top at z = {K.CELL_TOP:.1f}")
+print(f"sliding lid: slides out freely; turned round it stops after {key_in} mm")
+print("cradle key, turned 180 deg about " + "; ".join(cradle_key))
 print(f"header pins reach {pins_in:.1f} mm below the stand-on surface (CoreInk socket 8.0 mm deep)")
 if p1:
     print(f"on a P1-BASE: its J1 socket top at z = {p1[1]:.2f} (0 = flush with the P1-BASE lid)")
