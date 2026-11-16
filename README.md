@@ -39,12 +39,12 @@ The folder [pcb/jlcpcb](./pcb/jlcpcb) contains the files to have the PCB manufac
 
 1. Upload [`GERBER-needforheat-battery-base-hardware.zip`](./pcb/jlcpcb/GERBER-needforheat-battery-base-hardware.zip)
    on the [JLCPCB quote page](https://cart.jlcpcb.com/quote). Defaults are fine (2 layers, 1.6 mm).
-2. Select *PCB Assembly*, top side, and upload
+2. Select *PCB Assembly* and upload
    [`BOM-needforheat-battery-base-hardware.csv`](./pcb/jlcpcb/BOM-needforheat-battery-base-hardware.csv) and
    [`CPL-needforheat-battery-base-hardware.csv`](./pcb/jlcpcb/CPL-needforheat-battery-base-hardware.csv).
    JLCPCB offers *Standard* PCBA only for this board; the 2x8 header (through-hole) is soldered by JLCPCB as well.
-3. The six battery contacts (MYOUNG MY-AAA-15-J / 16-J) stand on the other side of the board and are not in the BOM:
-   solder them by hand (see [TODO.md](TODO.md)).
+3. Select *Assemble both sides*: the six battery contacts (MYOUNG MY-AAA-01 leaf contacts, C964855) sit on the other
+   side of the board and are in the BOM and the placement file (THT, soldered by JLCPCB).
 
 Schematic and layout printouts: [docs/needforheat-battery-base-hardware-sch.pdf](docs/needforheat-battery-base-hardware-sch.pdf)
 and [docs/needforheat-battery-base-hardware-pcb.pdf](docs/needforheat-battery-base-hardware-pcb.pdf). Simulation
@@ -74,8 +74,11 @@ quantities as the [P1-BASE](https://github.com/energiegedrag-nl/needforheat-p1-b
 About € 56 of every PCBA order is fixed: setup € 23.33, stencil € 7.49 and the loading fee for the eight extended
 parts € 25.28. That is why small orders are expensive per board. The components cost € 5.40 per board at 5 boards
 (JLCPCB buys minimum quantities) and € 3.46 at 100; the most expensive are the ADS1115 (U5) and the PCA9536 (U6),
-about € 1.10 each at 5 pieces. Not included: the six battery contacts (hand-soldered), the three AAA cells, and
-shipping (DHL, about € 21–25 per order for PCBs, about $ 8 for the prints).
+about € 1.10 each at 5 pieces. These quotes are for the top side only, from before the leaf contacts: assembling
+both sides (the six MY-AAA-01 contacts, THT on the back) adds about € 42 for 5 boards and € 50 for 10 (second setup
+€ 23.33, assembly fixture € 14.99, the contacts at about € 0.11 each and their soldering; estimate from the
+both-sides quote with the earlier contacts, to be re-quoted once the board is routed). Not included: the three AAA
+cells and shipping (DHL, about € 21–25 per order for PCBs, about $ 8 for the prints).
 
 Enclosure per set (JLC3DP, re-quoted 16 November 2026 with the cradle's bars between the cells): tray $ 1.99,
 lid $ 1.48, cradle $ 1.05; the bars did not change the price.
@@ -85,6 +88,22 @@ lid $ 1.48, cradle $ 1.05; the bars did not change the price.
 The design is generated with scripts in [tools](./tools), like the P1-BASE v3: KiCad schematic and PCB, autorouting
 with Freerouting, ngspice simulations, independent checks, and a parametric CadQuery enclosure. Open work is in
 [TODO.md](TODO.md).
+
+* **Enclosure first**: `python enclosure/kuip.py` (CadQuery) builds the tray, lid and cradle and writes
+  `enclosure/pcb_constraints.json` (contact places, keep-outs) for the PCB. `python enclosure/check_fit.py >
+  enclosure/fit-check.txt` checks every part against the others, including the real leaf contacts (the vendor's 3D
+  model, free and pressed by the shortest and longest cell, `enclosure/check_leaf.py`).
+* **PCB** (KiCad 10's Python, `%LOCALAPPDATA%\Programs\KiCad\10.0\bin\python.exe`): `tools/gen_footprints.py`,
+  `tools/gen_schematic.py`, then `tools/gen_pcb.py` places and routes (Freerouting, a few GB of memory; best from a
+  plain PowerShell window). Try `BBASE_VARIANT` 0..5 until the log shows `(0 unrouted`. After a small change, route
+  lightly instead (a few minutes, 1 GB): `gen_pcb.py --move-contacts` puts the contacts at their places from
+  `pcb_constraints.json` and re-routes only their tracks; `gen_pcb.py --reroute NET,NET` rips up and routes only those
+  nets, with the rest locked. (In Git Bash set `MSYS_NO_PATHCONV=1`, or net names such as `/EN` turn into paths.)
+* **Finish and check**: `tools/pcb_cleanup.py`, `kicad-cli pcb drc --refill-zones --save-board --schematic-parity`,
+  `tools/pcb_bridge_gnd.py` for GND islands left after routing, and `python tools/export_fab.py` for the Gerbers, BOM,
+  CPL, PDFs, renders and the PCB's STEP.
+* **3D models**: `tools/gen_3d_models.py` (header) and `tools/import_leaf_model.py <step>` (places the vendor's model
+  of the MY-AAA-01 from LCSC/EasyEDA in the footprint's frame).
 
 ## Status
 

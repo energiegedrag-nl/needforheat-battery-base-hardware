@@ -76,15 +76,16 @@ voltage at rest.
 
 * 36.3 x 52.3 mm, 2 layers, inside the CoreInk outline like the P1-BASE v3 (`INSET` 1.85 mm).
 * **Top side (KiCad F) = electronics**, facing the CoreInk or the P1-BASE in the 2.5 mm under the board (parts up to
-  2.2 mm): single-sided SMD assembly. The tray's corner blocks (7 x 7 mm) are on this side too.
-* **Bottom side (KiCad B) = cells**: the six contact plates (THT, tabs soldered on the top side by JLCPCB, listed as
-  "Wave Soldering, Economic and Standard PCBA"), the bus header's tails, and per cell an outline with + and - on the
-  silkscreen, where the user looks while inserting the cells.
+  2.2 mm): SMD assembly. The tray's corner blocks (7 x 7 mm) are on this side too, and the contacts' pins are
+  soldered from this side (Ø2.2 pads).
+* **Bottom side (KiCad B) = cells**: the six MY-AAA-01 leaf contacts (THT, two pins each, a copper pad under each end
+  of the foot; JLCPCB assembles both sides, Standard PCBA), the bus header's tails, and per cell a small battery with
+  + and - on the silkscreen between the contacts' feet, where the user looks while inserting the cells.
 * Coordinates: the enclosure frame is seen from the back; the PCB from its top side, i.e. from the CoreInk:
   x_pcb = 40 - x_enclosure. `tools/gen_pcb.py` reads the contact and cell positions from
   `enclosure/pcb_constraints.json`.
 * Bus header: XKB X6521WV-2x08H-C60D30 (C706898), 2.5 mm plastic, 6.0 mm pins, 3.0 mm tails (1.4 mm proud on the
-  cell side; the cells lie 1.6 mm up for it). The SMD version does not fit: its feet reach past the board edge.
+  cell side; cell 3's curve clears them). The SMD version does not fit: its feet reach past the board edge.
 
 ## 6. Parts (JLCPCB, 15 November 2026)
 
@@ -96,8 +97,7 @@ voltage at rest.
 | U5 | ADS1115IDGSR | C37593 | 12 546 |
 | U6 | PCA9536DGKR | C2649389 | 2 044 |
 | L1 | Sunlord SWPA3015S1R0NT, 1 µH, 3 x 3 x 1.5 mm | C43388 | 5 638 |
-| BC1, BC4, BC6 | MYOUNG MY-AAA-15-J (+ plate) | C51889749 | 907 |
-| BC2, BC3, BC5 | MYOUNG MY-AAA-16-J (- spring) | C51889750 | 805 |
+| BC1–BC6 | MYOUNG MY-AAA-01 leaf contact (same part at both ends) | C964855 | 1 231 |
 | J1 | XKB X6521WV-2x08H-C60D30 | C706898 | 319 |
 | Q1, Q2, Q6, Q7, Q9 / Q3–Q5, Q8, Q10, Q11 | AO3401A / 2N7002 (basic) | C15127 / C8545 | |
 | R, C | 0603/0805 basic parts (10M C7250, 470k C23178, ...) | | |
@@ -107,8 +107,9 @@ voltage at rest.
 1. TPS3840 hysteresis and the open-drain output pulled above its VDD (U3's ~RESET sits at up to VCELL through R10,
    while its VDD is the LiPo): check in the datasheet (TI SNVSB03).
 2. TPS61023: shutdown current, EN threshold and any internal EN pull-down (the latch drives EN through 10 kΩ).
-3. MYOUNG MY-AAA-15-J/16-J tab: straight through a 4.7 x 1.1 mm slot, as assumed? Order loose samples; check the
-   contact pressure with real cells (spring compressed to 3.2–4.2 mm).
+3. MYOUNG MY-AAA-01: shape measured from the vendor's 3D model; outer pins 45.0 mm apart (the layout's 42.4 mm
+   read as the outer pads' inner edges); the 1.5 mm pins end just inside the 1.6 mm PCB (JLCPCB's DFM check). Check
+   the contact pressure with real cells (each leaf gives way 0.6–1.3 mm). (The earlier MY-AAA-15-J/16-J plates have their tab bent 90°: they would lie flat.)
 4. JLCPCB placement preview of every part (rotation corrections in `tools/export_fab.py`, `JLC_CORR`), especially the
    new packages (SOT-563, MSOP-10, VSSOP-8, the inductor, the header) and the bottom-side contacts.
 5. Measure the off-state current of an assembled board (expected < 1 µA in total).

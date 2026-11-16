@@ -4,10 +4,8 @@ Adapted from tools/gen_3d_models.py of needforheat-p1-base-hardware.
 
 - 2x8 2.54 mm male pin header XKB X6521WV-2x08H-C60D30 (C706898): 2.5 mm plastic on the board, 6.0 mm pins above
   it, 3.0 mm tails through the board.
-- MYOUNG MY-AAA-15-J (+ plate, 1.43 mm button) and MY-AAA-16-J (- plate with spring, shown compressed as in the
-  enclosure): 9.0 x 8.0 x 0.3 mm plate standing on the board, its 4.0 mm wide tab down through the board and
-  trimmed (TAB_BELOW).
-  Heights and the compressed spring length come from enclosure/kuip.py.
+- MYOUNG MY-AAA-01 leaf contact: foot on the board, two pins down into it, the leaf at the outer end (free
+  position) with its dimple. Dimensions from enclosure/kuip.py.
 
 Models are approximations for renders and fit checks. Origin = footprint origin, z = 0 at the board surface on the
 footprint's side. Shapes are drawn in footprint coordinates (y down) and mirrored, because KiCad model y points up.
@@ -41,32 +39,27 @@ def pin_header():
     return asm
 
 
-def plate(plus):
-    z0, h, w, t = 0.0, K.PLATE_BODY, K.PLATE_W, 0.3
-    zc = K.CONTACT_C
-    body = cq.Workplane("XY").box(w, t, h, centered=(True, True, False)).translate((0, 0, z0))
-    below = K.PCB_T + K.TAB_BELOW  # tab through the board, trimmed
-    tab = cq.Workplane("XY").box(4.0, t, below, centered=(True, True, False)).translate((0, 0, z0 - below + 0.01))
-    metal = body.union(tab)
-    if plus:  # button facing +y (footprint frame)
-        button = (cq.Workplane("XZ").workplane(offset=-t / 2).center(0, zc).circle(2.0).extrude(-(K.BTN_H)))
-        metal = metal.union(button)
-    else:  # spring, compressed to the length it has in the enclosure, as five rings on a cone
-        L = K.SPRING_LEN
-        for k in range(5):
-            r = 3.6 - 0.35 * k
-            y = t / 2 + 0.3 + (L - 0.6) * k / 4
-            ring = cq.Workplane("XZ").workplane(offset=-y).center(0, zc).circle(r).circle(r - 0.6).extrude(-0.6)
-            metal = metal.union(ring)
-    asm = cq.Assembly(name="MY_AAA_15_J" if plus else "MY_AAA_16_J")
-    asm.add(metal.mirror("XZ"), name="plate", color=NICKEL)
+def leaf():
+    """Origin = outer pin, the foot and the inner pin along +y (footprint frame, y down), leaf at y = -PIN_OUT."""
+    w, yb = K.LEAF_W, -K.PIN_OUT
+    t = K.FOOT_T
+    foot = cq.Workplane("XY").box(w, K.FOOT_L, t, centered=(True, False, False)).translate((0, yb, 0))
+    lean = K.LEAF_LEAN
+    pts = [(yb, 0), (yb + K.LEAF_T, 0), (yb + K.LEAF_T + lean, K.LEAF_H + t), (yb + lean, K.LEAF_H + t)]
+    blade = cq.Workplane("YZ").workplane(offset=-w / 2).polyline(pts).close().extrude(w)
+    yd = yb + K.LEAF_T + lean * K.DIMPLE_Z / K.LEAF_H
+    dimple = cq.Workplane("XZ").workplane(offset=-yd).center(0, t + K.DIMPLE_Z).circle(1.25).extrude(-K.DIMPLE_H)
+    pins = cq.Workplane("XY").pushPoints([(0, 0), (0, K.PIN_PITCH)]).circle(K.PIN_D / 2).extrude(-K.PIN_LEN)
+    metal = foot.union(blade).union(dimple).union(pins)
+    asm = cq.Assembly(name="MY_AAA_01")
+    asm.add(metal.mirror("XZ"), name="leaf", color=NICKEL)
     return asm
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
     for name, asm in (("PinHeader_2x08_C60D30_approx", pin_header()),
-                      ("MYOUNG_MY-AAA-15-J_approx", plate(True)), ("MYOUNG_MY-AAA-16-J_approx", plate(False))):
+                      ("MYOUNG_MY-AAA-01_approx", leaf())):
         path = os.path.join(OUT, name + ".step")
         asm.save(path, exportType="STEP")
         print("wrote", os.path.normpath(path))

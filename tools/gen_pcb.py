@@ -53,20 +53,22 @@ FIXED = {
     "J1": (6.03, 36.87, 0),
 }
 # kuip pegs (NPTH) at three of the four LEGO-hole axes, mirrored from the enclosure frame (seen from the back):
-# (36, 4), (3.6, 50.4), (36, 52) there (enclosure/kuip.py PEGS). The corner without a peg keys the PCB
-PEGS = [(4.0, 4.0), (36.4, 50.4), (4.0, 52.0)]
+# (36, 4), (4, 52), (36, 52) there (enclosure/kuip.py PEGS), as on the P1-BASE v3. The corner without a peg keys the PCB
+PEGS = [(4.0, 4.0), (36.0, 52.0), (4.0, 52.0)]
 CORNERS = [(4.0, 4.0), (36.0, 4.0), (4.0, 52.0), (36.0, 52.0)]  # LEGO-hole axes: kuip corner blocks on the top side
 CORNER_BLOCK = 7.0  # the tray's corner blocks reach 7 mm in from the outline corner, on the top side
 # Blocks for the SMD parts (top side): rectangle (x1, y1, x2, y2) and the parts, packed in rows
 BLOCKS = [
     # power: boost, charger, isolation (right half seen from the CoreInk side)
-    ((19.6, 7.6, 37.55, 27.4), ["U1", "L1", "C1", "Q1", "R1", "R2", "C2", "C3", "U2", "R3", "C4", "Q7", "R9", "Q8"]),
-    # charge latch
-    ((19.6, 27.8, 37.55, 48.4), ["Q2", "R10", "R11", "R12", "R13", "C5", "Q3", "R14", "Q4", "R15", "Q5", "R16", "R17",
-                                 "U3", "C6", "R18", "U4", "R19", "Q6"]),
-    # firmware interface next to the bus header (SDA, SCL, 3V3)
+    ((19.6, 7.6, 37.55, 27.4), ["U1", "L1", "C1", "Q1", "R1", "R2", "C2", "C3", "U2", "R3", "C4"]),
+    # charge latch, and the isolation switch Q7/R9/Q8 (the leaf contacts' pins take room in the block above)
+    ((19.6, 27.8, 37.55, 48.4), ["Q7", "R9", "Q8", "Q2", "R10", "R11", "R12", "R13", "C5", "Q3", "R14", "Q4", "R15",
+                                 "Q5", "R16", "R17"]),
+    # firmware interface next to the bus header (SDA, SCL, 3V3), and the two voltage supervisors U3 and U4
     ((9.6, 7.6, 19.2, 48.4), ["U5", "C7", "U6", "C9", "Q9", "R20", "Q10", "R21", "R22", "Q11", "R23",
-                              "TP1", "TP2", "TP3", "TP4", "TP5"]),
+                              "U3", "C6", "R18", "U4", "R19"]),
+    # test points and Q6: above the bus header, left of the cell contacts' pins
+    ((2.6, 7.6, 9.4, 25.8), ["Q6", "TP1", "TP2", "TP3", "TP4", "TP5"]),
 ]
 CONTACTS_JSON = os.path.join(ROOT, "enclosure", "pcb_constraints.json")
 # schematic references of the six contacts: (cell 1..3, end) -> ref
@@ -226,32 +228,38 @@ def place_contacts(fps, obstacles):
         cell = xs.index(c["x"]) + 1
         ref = CONTACT_REF[(cell, c["end"])]
         fp = fps[ref]
-        fp.SetPosition(P(W - c["x"], c["y_plate_centre"]))
+        # footprint origin = the outer pin; the foot and the inner pin run along +y in the footprint, which the flip to
+        # the bottom side turns into -y on the board at 0 deg; so the top-end contacts turn 180 deg to reach in under
+        # their cell and the bottom-end ones stay at 0 (checked with the pad positions and a render)
+        fp.SetPosition(P(W - c["x"], c["y_pin_outer"]))
         fp.Flip(fp.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
-        # contact faces +y in the footprint; after the flip to the bottom side it faces -y on the board at 0 deg, so the
-        # top-end contacts turn 180 deg to face down towards their cell, the bottom-end ones stay at 0 (checked in a render)
         fp.SetOrientationDegrees(180 if c["end"] == "top" else 0)
         obstacles.append(rel_box(fps[ref]))
     return cons
 
 
 def cell_marks(b, cons):
-    """Polarity marks where the user looks while inserting the cells: on the bottom silkscreen, one battery outline
-    per cell with + and - at its ends (read from the back, so mirrored)."""
-    for cell in cons["cells"]:
-        x = W - cell["x"]
-        y0, y1 = cell["y_top"], cell["y_top"] + 44.5
-        s = pcbnew.PCB_SHAPE(b, pcbnew.SHAPE_T_RECT)
-        s.SetStart(P(x - 3.0, y0 + 4.0)); s.SetEnd(P(x + 3.0, y1 - 4.0))  # clear of J1's pads next to cell 3
-        s.SetLayer(pcbnew.B_SilkS); s.SetWidth(MM(0.2)); b.Add(s)
+    """Polarity marks where the user looks while inserting the cells: on the bottom silkscreen, a small battery per
+    cell with + and - at its ends (read from the back, so mirrored), between the contacts' feet (which cover the
+    PCB under the cells' ends)."""
+    xs = sorted({c["x"] for c in cons["contacts"]})
+    feet = [c["foot"]["y"] for c in cons["contacts"]]
+    ya = max(f[1] for f in feet if f[0] < H / 2) + 0.8  # below the top feet
+    yb = min(f[0] for f in feet if f[0] > H / 2) - 0.8  # above the bottom feet
+    for i, cell in enumerate(cons["cells"]):
+        x = W - xs[i]  # centred on the contacts (cell 3's sit off its axis, clear of the bus header)
         top_plus = cell["plus_end"] == "top"
-        nub_y = (y0 + 4.0 - 1.0, y0 + 4.0) if top_plus else (y1 - 4.0, y1 - 4.0 + 1.0)
+        y0, y1 = (ya + 1.0, yb) if top_plus else (ya, yb - 1.0)  # body; the nub takes the last 1 mm
+        s = pcbnew.PCB_SHAPE(b, pcbnew.SHAPE_T_RECT)
+        s.SetStart(P(x - 2.6, y0)); s.SetEnd(P(x + 2.6, y1))
+        s.SetLayer(pcbnew.B_SilkS); s.SetWidth(MM(0.2)); b.Add(s)
+        nub_y = (y0 - 1.0, y0) if top_plus else (y1, y1 + 1.0)
         n = pcbnew.PCB_SHAPE(b, pcbnew.SHAPE_T_RECT)
-        n.SetStart(P(x - 1.5, nub_y[0])); n.SetEnd(P(x + 1.5, nub_y[1]))
+        n.SetStart(P(x - 1.3, nub_y[0])); n.SetEnd(P(x + 1.3, nub_y[1]))
         n.SetLayer(pcbnew.B_SilkS); n.SetWidth(MM(0.2)); b.Add(n)
-        add_text(b, "+", x, (y0 + 7.0) if top_plus else (y1 - 7.0), 2.4, layer=pcbnew.B_SilkS, bold=True)
-        add_text(b, "-", x, (y1 - 7.0) if top_plus else (y0 + 7.0), 2.4, layer=pcbnew.B_SilkS, bold=True)
-        add_text(b, "AAA", x, (y0 + y1) / 2 + 2.5, 1.2, layer=pcbnew.B_SilkS, angle=90)
+        add_text(b, "+", x, (y0 + 2.2) if top_plus else (y1 - 2.2), 2.4, layer=pcbnew.B_SilkS, bold=True)
+        add_text(b, "-", x, (y1 - 2.2) if top_plus else (y0 + 2.2), 2.4, layer=pcbnew.B_SilkS, bold=True)
+        add_text(b, "AAA", x, (y0 + y1) / 2, 1.2, layer=pcbnew.B_SilkS, angle=90)
 
 
 def set_netclasses(b):
@@ -350,9 +358,8 @@ def build(route=True):
             it.SetStart(pcbnew.VECTOR2I(MM(2 * jx - pcbnew.ToMM(a.x)), a.y))
             it.SetEnd(pcbnew.VECTOR2I(MM(2 * jx - pcbnew.ToMM(e.x)), e.y))
     cell_marks(b, cons)
-    add_text(b, "NeedForHeat BatteryBASE v1.0", 20.0, 51.2, 0.9, layer=pcbnew.F_SilkS, bold=True)
-    add_text(b, "energiegedrag.nl - CERN-OHL-P v2", 20.0, 49.6, 0.8, layer=pcbnew.F_SilkS)
-    add_text(b, "3 x AAA - spring = minus", 20.0, 1.0 + INSET + 3.5, 0.9, layer=pcbnew.B_SilkS)
+    add_text(b, "NeedForHeat BatteryBASE v1.0", 20.0, 52.0, 0.8, layer=pcbnew.F_SilkS, bold=True)
+    add_text(b, "energiegedrag.nl - CERN-OHL-P v2", 20.0, 53.1, 0.8, layer=pcbnew.F_SilkS)
     for t in b.GetDrawings():
         if isinstance(t, pcbnew.PCB_TEXT) and t.GetLayer() == pcbnew.B_SilkS:
             t.SetMirrored(True)
@@ -435,7 +442,8 @@ def fanout_gnd(b, via_d=0.56, drill=0.3, width=0.3, clr=0.3, ep_area=2.0):
     n = 0
     smd = [(fp, pad, s) for fp in sorted(b.GetFootprints(), key=lambda f: f.GetReference())
            for pad, s in [(p, shape(p)) for p in fp.Pads()]
-           if pad.GetNetCode() == g and pad.GetAttribute() == pcbnew.PAD_ATTRIB_SMD]
+           if pad.GetNetCode() == g and pad.GetAttribute() == pcbnew.PAD_ATTRIB_SMD
+           and not fp.GetReference().startswith("BC")]  # the cell contacts' foot pads connect through their pins
     # exposed pads: thermal vias inside the pad, along its long axis
     for fp, pad, s in smd:
         sz = pad.GetSize(pcbnew.F_Cu)
@@ -747,8 +755,121 @@ def restitch(path):
     pcbnew.SaveBoard(path, b)
 
 
+def move_contacts(path, route=True, clr=0.25, rip_nets=(), move=True):
+    """Light re-route after the contacts moved in pcb_constraints.json: put the six BC footprints at their new
+    places, rip up only the tracks that end on a contact or now lie in the way (plus all tracks of the nets that
+    only link contacts), and let Freerouting route just those connections with the rest of the routing locked.
+    With move=False the contacts stay and only the nets in rip_nets are ripped up and routed again."""
+    import json
+    b = pcbnew.LoadBoard(path)
+    cons = json.load(open(CONTACTS_JSON, encoding="utf8"))
+    xs = sorted({c["x"] for c in cons["contacts"]})
+    bcs = []
+    for c in (cons["contacts"] if move else []):
+        old = b.FindFootprintByReference(CONTACT_REF[(xs.index(c["x"]) + 1, c["end"])])
+        # a fresh copy from the library (the footprint may have changed), with the old one's ref, fields and nets
+        fp = load_fp("bbase:" + old.GetFPID().GetLibItemName().wx_str())
+        fp.SetReference(old.GetReference()); fp.SetValue(old.GetValue())
+        for k in ("LCSC",):
+            if old.HasField(k):
+                fp.SetField(k, old.GetFieldText(k))
+                fp.GetField(k).SetVisible(False); fp.GetField(k).SetLayer(pcbnew.F_Fab)
+        fp.Reference().SetVisible(False)
+        nets = {p.GetNumber(): p.GetNet() for p in old.Pads()}
+        b.Delete(old)
+        b.Add(fp)
+        for p in fp.Pads():
+            p.SetNet(nets[p.GetNumber()])
+        fp.SetPosition(P(W - c["x"], c["y_pin_outer"]))
+        fp.Flip(fp.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
+        fp.SetOrientationDegrees(180 if c["end"] == "top" else 0)
+        bcs.append(fp)
+    bc_nets = {p.GetNetCode() for f in bcs for p in f.Pads()} | {b.FindNet(n).GetNetCode() for n in rip_nets}
+    gnd = b.FindNet("GND").GetNetCode()
+    pads = [p for f in bcs for p in f.Pads()]
+    removed = 0
+    for t in list(b.GetTracks()):
+        rip = t.GetNetCode() in bc_nets and t.GetNetCode() != gnd  # contact-to-contact nets: route them anew
+        if not rip:
+            for p in pads:
+                layers = [l for l in (pcbnew.F_Cu, pcbnew.B_Cu) if p.IsOnLayer(l) and t.IsOnLayer(l)]
+                if any(p.GetEffectiveShape(l).Collide(t.GetEffectiveShape(l), MM(clr)) for l in layers):
+                    rip = True
+                    break
+        if rip:
+            b.Delete(t)
+            removed += 1
+    # stubs left behind: tracks (not GND, whose ends may rest in the pour) with an end on nothing
+    while True:
+        ends = {}
+        for t in b.GetTracks():
+            for q in ((t.GetPosition(),) if isinstance(t, pcbnew.PCB_VIA) else (t.GetStart(), t.GetEnd())):
+                ends[(q.x, q.y)] = ends.get((q.x, q.y), 0) + 1
+        allpads = [p for f in b.GetFootprints() for p in f.Pads()]
+        stubs = []
+        tracks = [o for o in b.GetTracks() if not isinstance(o, pcbnew.PCB_VIA)]
+        for t in b.GetTracks():
+            if t.GetNetCode() == gnd:
+                continue
+            if isinstance(t, pcbnew.PCB_VIA):
+                q = t.GetPosition()
+                if ends[(q.x, q.y)] < 3:  # the via and at most one track: leads nowhere
+                    stubs.append(t)
+                continue
+            for q in (t.GetStart(), t.GetEnd()):
+                if ends[(q.x, q.y)] < 2 and not any(p.GetNetCode() == t.GetNetCode() and p.HitTest(q) for p in allpads)                         and not any(o is not t and o.GetNetCode() == t.GetNetCode() and o.IsOnLayer(t.GetLayer())
+                                    and o.HitTest(q, 0) for o in tracks):  # a T-junction is not a loose end
+                    stubs.append(t)
+                    break
+        if not stubs:
+            break
+        for t in stubs:
+            b.Delete(t)
+            removed += 1
+    print("contacts moved; tracks and vias removed:", removed)
+    filler = pcbnew.ZONE_FILLER(b)
+    filler.Fill(b.Zones())
+    b.BuildConnectivity()
+    pcbnew.SaveBoard(path, b)
+    if not route:
+        return
+    # lock what stays, route the rest, unlock again
+    def key(t):
+        return (t.GetClass(), t.GetNetCode(), t.GetStart().x, t.GetStart().y, t.GetEnd().x, t.GetEnd().y)
+    was_locked = {key(t) for t in b.GetTracks() if t.IsLocked()}
+    keep = [key(t) for t in b.GetTracks()]
+    for t in b.GetTracks():
+        t.SetLocked(True)
+    dsn, ses = path[:-10] + ".dsn", path[:-10] + ".ses"
+    if not pcbnew.ExportSpecctraDSN(b, dsn):
+        raise SystemExit("DSN export failed")
+    cmd = [JAVA, "-Xmx" + os.environ.get("BBASE_JAVA_XMX", "1g"), "-jar", FREEROUTING, "-de", dsn, "-do", ses,
+           "-mp", os.environ.get("BBASE_PASSES", "20"), "-mt", "1", "--gui.enabled=false"]
+    print(" ".join(cmd))
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=int(os.environ.get("BBASE_ROUTE_TIMEOUT", "600")))
+    print(r.stdout[-2000:], r.stderr[-2000:])
+    if not os.path.exists(ses) or not pcbnew.ImportSpecctraSES(b, ses):
+        raise SystemExit("Freerouting produced no usable SES file")
+    after = {key(t) for t in b.GetTracks()}
+    lost = [k for k in keep if k not in after]
+    print(f"tracks/vias before {len(keep)}, after {len(after)}, of the locked ones lost: {len(lost)}")
+    for t in b.GetTracks():
+        t.SetLocked(key(t) in was_locked)
+    filler.Fill(b.Zones())
+    pcbnew.SaveBoard(path, b)
+    fix_islands(path)
+    for f in (dsn, ses):
+        os.remove(f)
+    print("re-routed board saved:", path)
+
+
 if __name__ == "__main__":
-    if "--islands" in sys.argv:
+    if "--move-contacts" in sys.argv:
+        move_contacts(os.path.join(PCBDIR, NAME + ".kicad_pcb"), route="--no-route" not in sys.argv)
+    elif "--reroute" in sys.argv:  # --reroute NET,NET,...: rip up these nets and route them again, the rest locked
+        move_contacts(os.path.join(PCBDIR, NAME + ".kicad_pcb"), rip_nets=sys.argv[sys.argv.index("--reroute") + 1]
+                      .split(","), move=False)
+    elif "--islands" in sys.argv:
         fix_islands(os.path.join(PCBDIR, NAME + ".kicad_pcb"))
     elif "--stitch" in sys.argv:
         restitch(os.path.join(PCBDIR, NAME + ".kicad_pcb"))

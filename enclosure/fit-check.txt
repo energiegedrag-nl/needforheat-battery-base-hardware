@@ -1,7 +1,28 @@
 COLLISIONS: none
-closest approach < 0.5 mm: [(0.0, 'contacts', 'PCB'), (0.0, 'contacts', 'cells'), (0.0, 'cradle', 'PCB'), (0.0, 'cradle', 'cells'), (0.0, 'cradle', 'contacts'), (0.0, 'tray', 'CoreInk'), (0.0, 'tray', 'PCB'), (0.0, 'tray', 'lid'), (0.0, 'tray (crush ribs only, 1.33 mm3)', 'P1-BASE lid'), (0.01, '10.1 mm cell 3 against the stop', 'cradle'), (0.01, '10.7 mm cells rolled left', 'cradle'), (0.01, '10.7 mm cells rolled left', 'tray'), (0.01, '10.7 mm cells rolled right', 'cradle'), (0.03, 'cradle', 'tray'), (0.1, 'cradle', 'lid'), (0.2, 'header', 'CoreInk'), (0.21, '10.1 mm cell 3 against the stop', 'header'), (0.25, 'header', 'P1-BASE lid'), (0.29, 'header (tails on top)', 'cells'), (0.34, '10.7 mm cells rolled right', 'header'), (0.38, 'tray', 'cells'), (0.39, 'cradle', 'header'), (0.4, 'contacts', 'tray')]
-lid top 17.3 mm above the stand-on surface; cells 10.5 mm, top at z = 14.6
+closest approach < 0.5 mm: [(0.0, '10.1 mm cell 3 against the stop', 'contacts'), (0.0, '10.7 mm cells rolled left', 'contacts'), (0.0, '10.7 mm cells rolled right', 'contacts'), (0.0, 'contacts', 'PCB'), (0.0, 'contacts', 'cells'), (0.0, 'cradle', 'PCB'), (0.0, 'cradle', 'cells'), (0.0, 'tray', 'CoreInk'), (0.0, 'tray', 'PCB'), (0.0, 'tray', 'lid'), (0.0, 'tray (crush ribs only, 1.33 mm3)', 'P1-BASE lid'), (0.01, '10.1 mm cell 3 against the stop', 'cradle'), (0.01, '10.7 mm cells rolled left', 'cradle'), (0.01, '10.7 mm cells rolled left', 'tray'), (0.01, '10.7 mm cells rolled right', 'cradle'), (0.03, 'cradle', 'tray'), (0.1, 'cradle', 'lid'), (0.2, 'contacts', 'tray'), (0.2, 'header', 'CoreInk'), (0.25, 'header', 'P1-BASE lid'), (0.3, 'cradle', 'contacts'), (0.39, 'cradle', 'header'), (0.42, '10.1 mm cell 3 against the stop', 'header'), (0.46, 'tray', 'cells'), (0.5, '10.7 mm cells rolled left', 'lid'), (0.5, '10.7 mm cells rolled right', 'lid'), (0.5, 'header (tails on top)', 'cells')]
+lid top 17.8 mm above the stand-on surface; cells 10.5 mm, top at z = 15.1
 sliding lid: slides out freely; turned round it stops after 1.0 mm
-cradle key, turned 180 deg about z: 21.1 mm3 in the tray; x: 21.1 mm3 in the tray; y: 21.1 mm3 in the tray
+cradle key, turned 180 deg about z: 21.9 mm3 in the tray; x: 21.9 mm3 in the tray; y: 21.9 mm3 in the tray
 header pins reach 6.0 mm below the stand-on surface (CoreInk socket 8.0 mm deep)
 on a P1-BASE: its J1 socket top at z = -0.00 (0 = flush with the P1-BASE lid)
+
+real leaf contacts (vendor model, free and pressed; check_leaf.py):
+free                                   tray                           gap 0.45 mm
+free                                   lid                            gap 1.56 mm
+free                                   cradle                         gap 0.30 mm
+free                                   PCB (the feet rest on it)      gap 0.01 mm
+free                                   highest point above the PCB     10.14 mm
+free                                   lid underside above the PCB     11.70 mm
+pressed 0.59 mm (shortest cell)        tray                           gap 0.45 mm
+pressed 0.59 mm (shortest cell)        lid                            gap 1.51 mm
+pressed 0.59 mm (shortest cell)        cradle                         gap 0.30 mm
+pressed 0.59 mm (shortest cell)        PCB (the feet rest on it)      gap 0.01 mm
+pressed 0.59 mm (shortest cell)        highest point above the PCB     10.19 mm
+pressed 0.59 mm (shortest cell)        lid underside above the PCB     11.70 mm
+pressed 1.34 mm (longest cell)         tray                           gap 0.45 mm
+pressed 1.34 mm (longest cell)         lid                            gap 1.59 mm
+pressed 1.34 mm (longest cell)         cradle                         gap 0.30 mm
+pressed 1.34 mm (longest cell)         PCB (the feet rest on it)      gap 0.01 mm
+pressed 1.34 mm (longest cell)         highest point above the PCB     10.11 mm
+pressed 1.34 mm (longest cell)         lid underside above the PCB     11.70 mm
+RESULT: fits

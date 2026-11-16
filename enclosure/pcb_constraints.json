@@ -58,69 +58,25 @@
    ]
   },
   {
-   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
+   "what": "contact pin solder joint (pocket in the corner block)",
    "x": [
-    4.0337037581539175,
-    9.233703758153919
+    5.208333333333331,
+    8.208333333333332
    ],
    "y": [
-    2.2,
-    4.2
+    4.0,
+    7.0
    ]
   },
   {
-   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
+   "what": "contact pin solder joint (pocket in the corner block)",
    "x": [
-    4.0337037581539175,
-    9.233703758153919
+    5.208333333333331,
+    8.208333333333332
    ],
    "y": [
-    51.8,
-    53.8
-   ]
-  },
-  {
-   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
-   "x": [
-    14.917407516307838,
-    20.11740751630784
-   ],
-   "y": [
-    2.2,
-    4.2
-   ]
-  },
-  {
-   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
-   "x": [
-    14.917407516307838,
-    20.11740751630784
-   ],
-   "y": [
-    51.8,
-    53.8
-   ]
-  },
-  {
-   "what": "+ plate MY-AAA-15-J tab and solder joint (pocket in the corner block)",
-   "x": [
-    25.801111274461753,
-    31.001111274461756
-   ],
-   "y": [
-    2.2,
-    4.2
-   ]
-  },
-  {
-   "what": "- spring MY-AAA-16-J tab and solder joint (pocket in the corner block)",
-   "x": [
-    25.801111274461753,
-    31.001111274461756
-   ],
-   "y": [
-    51.8,
-    53.8
+    49.0,
+    52.0
    ]
   }
  ],
@@ -151,7 +107,7 @@
   {
    "what": "cradle stop (right of cell 3)",
    "x": [
-    33.651111274461755,
+    33.87499999999999,
     38.25
    ],
    "y": [
@@ -162,7 +118,7 @@
   {
    "what": "cradle stop (right of cell 3)",
    "x": [
-    33.651111274461755,
+    33.87499999999999,
     38.25
    ],
    "y": [
@@ -173,7 +129,7 @@
   {
    "what": "cradle stop (right of cell 3)",
    "x": [
-    33.651111274461755,
+    33.87499999999999,
     38.25
    ],
    "y": [
@@ -195,8 +151,8 @@
   {
    "what": "cradle bar between cells",
    "x": [
-    11.375555637230878,
-    12.775555637230877
+    11.487499999999997,
+    12.887499999999996
    ],
    "y": [
     2.45,
@@ -206,8 +162,8 @@
   {
    "what": "cradle bar between cells",
    "x": [
-    22.2592593953848,
-    23.659259395384797
+    22.44583333333333,
+    23.845833333333328
    ],
    "y": [
     2.45,
@@ -225,104 +181,134 @@
  },
  "contacts": [
   {
-   "part": "+ plate MY-AAA-15-J",
+   "part": "MYOUNG MY-AAA-01 leaf contact",
    "end": "top",
-   "x": 6.633703758153918,
-   "y_plate_centre": 3.2,
-   "width": 9.0,
-   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
-   "contacts": [
-    {
-     "x": 6.633703758153918,
-     "polarity": "+"
-    }
-   ]
+   "polarity": "+",
+   "x": 6.708,
+   "y_pin_outer": 5.5,
+   "y_pin_inner": 15.75,
+   "foot": {
+    "x": [
+     3.533,
+     9.883
+    ],
+    "y": [
+     2.84,
+     18.41
+    ]
+   },
+   "pins": "2 x \u00d81.0 x 1.5 in \u00d81.2 holes, soldered from the underside"
   },
   {
-   "part": "- spring MY-AAA-16-J",
+   "part": "MYOUNG MY-AAA-01 leaf contact",
    "end": "bottom",
-   "x": 6.633703758153918,
-   "y_plate_centre": 52.8,
-   "width": 9.0,
-   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
-   "contacts": [
-    {
-     "x": 6.633703758153918,
-     "polarity": "-"
-    }
-   ]
+   "polarity": "-",
+   "x": 6.708,
+   "y_pin_outer": 50.5,
+   "y_pin_inner": 40.25,
+   "foot": {
+    "x": [
+     3.533,
+     9.883
+    ],
+    "y": [
+     37.59,
+     53.16
+    ]
+   },
+   "pins": "2 x \u00d81.0 x 1.5 in \u00d81.2 holes, soldered from the underside"
   },
   {
-   "part": "- spring MY-AAA-16-J",
+   "part": "MYOUNG MY-AAA-01 leaf contact",
    "end": "top",
-   "x": 17.517407516307838,
-   "y_plate_centre": 3.2,
-   "width": 9.0,
-   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
-   "contacts": [
-    {
-     "x": 17.517407516307838,
-     "polarity": "-"
-    }
-   ]
+   "polarity": "-",
+   "x": 17.667,
+   "y_pin_outer": 5.5,
+   "y_pin_inner": 15.75,
+   "foot": {
+    "x": [
+     14.492,
+     20.842
+    ],
+    "y": [
+     2.84,
+     18.41
+    ]
+   },
+   "pins": "2 x \u00d81.0 x 1.5 in \u00d81.2 holes, soldered from the underside"
   },
   {
-   "part": "+ plate MY-AAA-15-J",
+   "part": "MYOUNG MY-AAA-01 leaf contact",
    "end": "bottom",
-   "x": 17.517407516307838,
-   "y_plate_centre": 52.8,
-   "width": 9.0,
-   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
-   "contacts": [
-    {
-     "x": 17.517407516307838,
-     "polarity": "+"
-    }
-   ]
+   "polarity": "+",
+   "x": 17.667,
+   "y_pin_outer": 50.5,
+   "y_pin_inner": 40.25,
+   "foot": {
+    "x": [
+     14.492,
+     20.842
+    ],
+    "y": [
+     37.59,
+     53.16
+    ]
+   },
+   "pins": "2 x \u00d81.0 x 1.5 in \u00d81.2 holes, soldered from the underside"
   },
   {
-   "part": "+ plate MY-AAA-15-J",
+   "part": "MYOUNG MY-AAA-01 leaf contact",
    "end": "top",
-   "x": 28.401111274461755,
-   "y_plate_centre": 3.2,
-   "width": 9.0,
-   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
-   "contacts": [
-    {
-     "x": 28.401111274461755,
-     "polarity": "+"
-    }
-   ]
+   "polarity": "+",
+   "x": 27.875,
+   "y_pin_outer": 5.5,
+   "y_pin_inner": 15.75,
+   "foot": {
+    "x": [
+     24.7,
+     31.05
+    ],
+    "y": [
+     2.84,
+     18.41
+    ]
+   },
+   "pins": "2 x \u00d81.0 x 1.5 in \u00d81.2 holes, soldered from the underside"
   },
   {
-   "part": "- spring MY-AAA-16-J",
+   "part": "MYOUNG MY-AAA-01 leaf contact",
    "end": "bottom",
-   "x": 28.401111274461755,
-   "y_plate_centre": 52.8,
-   "width": 9.0,
-   "tab": "4.0 wide, straight through a PCB slot, plate standing on the PCB, soldered on the underside, trimmed to 1.6 mm (VERIFY)",
-   "contacts": [
-    {
-     "x": 28.401111274461755,
-     "polarity": "-"
-    }
-   ]
+   "polarity": "-",
+   "x": 27.875,
+   "y_pin_outer": 50.5,
+   "y_pin_inner": 40.25,
+   "foot": {
+    "x": [
+     24.7,
+     31.05
+    ],
+    "y": [
+     37.59,
+     53.16
+    ]
+   },
+   "pins": "2 x \u00d81.0 x 1.5 in \u00d81.2 holes, soldered from the underside"
   }
  ],
  "cells": [
   {
-   "x": 6.633703758153918,
-   "y_top": 4.25,
+   "x": 6.708333333333331,
+   "y_top": 5.75,
    "plus_end": "top"
   },
   {
-   "x": 17.517407516307838,
-   "y_top": 7.25,
+   "x": 17.66666666666666,
+   "y_top": 5.75,
    "plus_end": "bottom"
   },
   {
-   "x": 28.401111274461755,
-   "y_top": 4.25,
+   "x": 28.624999999999993,
+   "y_top": 5.75,
    "plus_end": "top"
   }
  ],
@@ -332,8 +318,8 @@
    4
   ],
   [
-   3.6,
-   50.4
+   4,
+   52
   ],
   [
    36,

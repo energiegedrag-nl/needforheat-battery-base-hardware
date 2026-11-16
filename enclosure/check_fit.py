@@ -66,7 +66,8 @@ for an, a in (("tray", tray), ("lid", lid)):
     for bn, b in (("PCB", pcb), ("cells", cells), ("header", hdr)):
         chk(an, a, bn, b)
 chk("tray", tray, "lid", lid)
-# cradle and contacts: the cradle sits on the PCB and backs the plates; buttons and springs touch the cells
+# cradle and contacts: the cradle sits on the PCB behind the leaves; the leaves (pressed back by nominal cells) touch
+# the cells' ends, the cells lie on the contacts' feet
 for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells), ("contacts", cont), ("header", hdr)):
     chk("cradle", cradle, bn, b)
 for bn, b in (("tray", tray), ("lid", lid), ("PCB", pcb), ("cells", cells)):
@@ -76,10 +77,10 @@ chk("header (tails on top)", hdr, "contacts", cont)
 
 
 def cell_set(d, xs):
-    """Cells of diameter d lying on the PCB at the given axes, nominal length, at the nominal y."""
+    """Cells of diameter d lying on the contacts' feet at the given axes, nominal length, at the nominal y."""
     out = None
     for i, x in enumerate(xs):
-        c = cq.Workplane("XY").add(cq.Solid.makeCylinder(d / 2, K.AAA_L, cq.Vector(x, -K.cell_y0(i), K.Z_PCB + d / 2),
+        c = cq.Workplane("XY").add(cq.Solid.makeCylinder(d / 2, K.AAA_L, cq.Vector(x, -K.cell_y0(i), K.Z_PCB + K.CELL_LIFT + d / 2),
                                                           cq.Vector(0, -1, 0)))
         out = c if out is None else out.union(c)
     return w(out)
@@ -95,7 +96,7 @@ thick_right = cell_set(_dm, [xb - _rr for xb in K.BAR_X] + [K.X_STOP - _dm / 2 -
 thin_right = cell_set(_dn, [K.X_STOP - _dn / 2 - 0.01])
 for an, a in ((f"{_dm} mm cells rolled left", thick_left), (f"{_dm} mm cells rolled right", thick_right),
               (f"{_dn} mm cell 3 against the stop", thin_right)):
-    for bn, b in (("tray", tray), ("lid", lid), ("cradle", cradle), ("header", hdr)):
+    for bn, b in (("tray", tray), ("lid", lid), ("cradle", cradle), ("header", hdr), ("contacts", cont)):
         chk(an, a, bn, b)
 
 # the sliding lid: path out towards the top edge (CadQuery +y, K.LID_OUT), and the key against turning it round
@@ -179,3 +180,7 @@ if p1:
     print(f"on a P1-BASE: its J1 socket top at z = {p1[1]:.2f} (0 = flush with the P1-BASE lid)")
 else:
     print("P1-BASE checkout not found: step 3 skipped")
+
+print("\nreal leaf contacts (vendor model, free and pressed; check_leaf.py):")
+import check_leaf  # noqa: E402
+check_leaf.main()
