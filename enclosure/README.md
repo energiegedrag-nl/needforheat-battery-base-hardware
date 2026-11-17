@@ -54,7 +54,7 @@ their contacts on the **back side** (towards the lid).
   drops into a vertical groove in the tray's top wall; turned 180° about any axis, the lip lands on the wall and the
   cradle does not go in (`check_fit.py` checks all three). The PCB's keep-outs (both sides), contact and cell
   positions are in [`pcb_constraints.json`](pcb_constraints.json).
-* **Plugging in and pulling off** with the whole module: the cradle's end ribs reach to 0.1 mm under the lid, so
+* **Plugging in and pulling off** with the whole module: the cradle's end ribs reach to 0.4 mm under the lid (`RIB_GAP`: the printed tolerances of tray, PCB, cradle and lid add up to about ± 0.35 mm; the lid must never drag on the ribs), so
   the cradle clamps the PCB between the lid and the tray's corner blocks. Pushing on the tray or the lid: tray ->
   grooves -> lid -> ribs -> PCB -> header pins. Pulling on the tray: corner blocks under the PCB -> PCB -> pins.
   Push it on with the lid in place; pulling it off also works without the lid.
@@ -106,9 +106,12 @@ padding); `kuip.py` asserts this. BatteryBASE: 24.5 mm.
    which clears them by its curve (`HDR_CLR` = 0.3 mm vertically for the thinnest cell against the stop; 0.21 mm
    shortest distance). The stop's position follows from the pins (`X_STOP`).
 4. **Thin wall** (1.0 mm, MJF PA12; about 0.8 mm is the usual minimum): check on the print.
-5. Sliding fit and click (MJF PA12): 0.2 mm play per side (`SL_CLR`), bump 0.4 mm (`DET_H`), tab 1.3 mm thick and
-   about 9.5 mm free (`TAB_T`, `TAB_L`). Estimated: about 4 N on the tab's bump, about 6 N to pull the lid open.
-   Adjust after a test print.
+5. Sliding fit and click (MJF PA12): 0.2 mm play per side and 0.2 mm vertically (`SL_CLR`, `GR_H`), bump 0.4 mm
+   (`DET_H`), tab 1.3 mm thick and about 9.5 mm free (`TAB_T`, `TAB_L`). Estimated: about 4 N on the tab's bump, about
+   6 N to pull the lid open. MJF prints to about ± 0.2 mm, so order the second lid `battery-base-lid-loose` (0.3 mm
+   per side and vertically, `SL_CLR_LOOSE`, `TONGUE_H_LOOSE`) in the same order: if the normal lid is too tight, no
+   re-print is needed. Adjust after the test print.
+6. **PCB pegs**: Ø2.0 pegs in Ø2.4 holes (0.2 mm radial play against ± 0.2 mm on the pegs' spacing of 48 mm).
 
 ## Printed fit check (November 2026)
 

@@ -60,7 +60,7 @@ PEG_D = 2.0
 GAP = 2.5  # stand-on surface -> PCB bottom = plastic of a standard 2x8 male header
 PCB_T = 1.6
 INSET = WALL + CLR  # PCB = CoreInk outline minus INSET on every side: 36.3 x 52.3 mm (as the P1-BASE v3)
-# Ø2.2 NPTH in the PCB on the corner blocks, at the same places as on the P1-BASE v3; the top-left corner keys the PCB
+# Ø2.4 NPTH in the PCB (0.2 mm radial play) on the corner blocks, at the same places as on the P1-BASE v3; the top-left corner keys the PCB
 PEGS = [(36, 4), (4, 52), (36, 52)]
 HDR_PIN = 6.0  # header pins below the plastic, into the socket below
 # The bus header: a plain 2x8 male pin header, pins down (the BatteryBASE ends the stack, so no socket on top, unlike
@@ -232,14 +232,18 @@ THIN_Z = (Z_PCB + AAA_D_MAX / 2 - 3.3, Z_TOP - 1.0)
 # Cradle end ribs reach up to just under the lid: the cradle is the clamp between the lid and the PCB. Pushing the
 # module onto the CoreInk: tray -> grooves -> lid tongue -> lid -> ribs -> PCB -> header pins (and pushing on the lid
 # goes straight lid -> ribs). Pulling it off: tray -> corner blocks under the PCB -> header pins. Play in the chain:
-# groove 0.2 + RIB_GAP.
-RIB_GAP = 0.1  # rib top to lid underside: the lid slides over the ribs
+# groove 0.2 + RIB_GAP. RIB_GAP covers the tolerances of the chain groove - corner blocks - PCB (1.6 mm +- 10 %) -
+# rib - lid (about +- 0.35 mm with MJF's +- 0.2 mm per printed dimension): the lid must never drag on the ribs; too
+# much only lets the PCB move a few tenths (the header has 6 mm of engagement).
+RIB_GAP = 0.4  # rib top to lid underside: the lid slides over the ribs
 RIB_TOP = Z_TOP - RIB_GAP
 Z_LID = Z_TOP + LID_T  # outer face
 GR_D = 0.7  # groove depth into the long walls and the top wall (the lid's tongue runs in it)
 TONGUE_H = 0.8  # tongue: the lower part of the lid's edge
 GR_H = TONGUE_H + 0.2  # groove height (0.2 mm vertical play)
 SL_CLR = 0.2  # sideways play of the lid in the walls and grooves, per side (MJF PA12, VERIFY on the print)
+# a second lid with more play, printed in the same order: if the first one is too tight, no re-print is needed
+SL_CLR_LOOSE, TONGUE_H_LOOSE = 0.3, TONGUE_H - 0.1  # 0.3 mm per side, 0.3 mm vertical
 CAP_GAP = 0.1  # seam between the cap and the ends of the long walls
 # The lid and its slot are drawn with the open end at the bottom and then mirrored top <-> bottom (lid_mirror), so
 # the lid slides in from the top edge. LID_OUT: CadQuery y direction in which the lid slides out (+1 = up).
@@ -347,10 +351,10 @@ def kuip():
     return body
 
 
-def lid():
+def lid(clr=SL_CLR, tongue_h=TONGUE_H):
     y_cap = CI_H - WALL + CAP_GAP
-    plate = channel(-WALL - SL_CLR, Z_TOP, Z_LID, y_cap + 0.01)
-    tongue = channel(-WALL + GR_D - SL_CLR, Z_TOP, Z_TOP + TONGUE_H, y_cap + 0.01)
+    plate = channel(-WALL - clr, Z_TOP, Z_LID, y_cap + 0.01)
+    tongue = channel(-WALL + GR_D - clr, Z_TOP, Z_TOP + tongue_h, y_cap + 0.01)
     cap = box(-1, CI_W + 1, y_cap, CI_H + 1, Z_TOP, Z_LID).intersect(slab(CI_W, CI_H, CI_R, Z_TOP, Z_LID))
     body = plate.union(tongue).union(cap)
     # tab: two slots open at the bottom edge, thinned from the outside (thumb rest), grip ridges, click bump below
@@ -487,7 +491,7 @@ def fit_parts():
     pcb = (cq.Workplane("XY").workplane(offset=GAP).center(*P(CI_W / 2, CI_H / 2))
            .rect(CI_W - 2 * INSET, CI_H - 2 * INSET).extrude(PCB_T).edges("|Z").fillet(CI_R - INSET + 0.5))
     for (x, y) in PEGS:
-        pcb = pcb.cut(cq.Workplane("XY").workplane(offset=GAP - 0.1).center(*P(x, y)).circle(1.1).extrude(PCB_T + 0.2))
+        pcb = pcb.cut(cq.Workplane("XY").workplane(offset=GAP - 0.1).center(*P(x, y)).circle(1.2).extrude(PCB_T + 0.2))  # Ø2.4
     for xc, yp in contact_pins():  # the contacts' holes (Ø1.2 drill)
         pcb = pcb.cut(cq.Workplane("XY").workplane(offset=GAP - 0.1).center(*P(xc, yp)).circle(0.6)
                       .extrude(PCB_T + 0.2))
@@ -556,7 +560,9 @@ def main():
         json.dump(pcb_constraints(), f, indent=1)
     print("wrote pcb_constraints.json")
     k, l, cr = kuip(), lid(), cradle()
-    for name, part in (("battery-base-kuip", k), ("battery-base-lid", l), ("battery-base-cradle", cr)):
+    loose = lid(SL_CLR_LOOSE, TONGUE_H_LOOSE)
+    for name, part in (("battery-base-kuip", k), ("battery-base-lid", l), ("battery-base-lid-loose", loose),
+                       ("battery-base-cradle", cr)):
         cq.exporters.export(part, os.path.join(OUT, name + ".step"))
         cq.exporters.export(part, os.path.join(OUT, name + ".stl"), tolerance=0.02, angularTolerance=0.1)
         print("wrote", name)

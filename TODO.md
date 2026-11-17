@@ -1,7 +1,9 @@
 # TODO – needforheat-battery-base-hardware
 
-Open work for this repository. Status on 16 November 2026: the design is complete (schematic, routed PCB,
-fabrication files, enclosure; DRC and fit checks clean) on branch `feature/leaf-contacts`, not built yet. How the
+Open work for this repository. Status on 17 November 2026: the design is complete (schematic, routed PCB,
+fabrication files, enclosure; DRC and fit checks clean), with the fixes from the independent review of 17 November
+2026 (boost layout, pads and rule areas under the contacts' feet, fuse F1, PCA9536 power-up, latch resistors,
+enclosure play) on branch `feature/review-fixes`; not built yet. How the
 design is generated and checked: [README § Developing](README.md#developing).
 
 ## Soon
@@ -9,14 +11,17 @@ design is generated and checked: [README § Developing](README.md#developing).
 - [ ] Decide whether the vendor's 3D model of the MY-AAA-01 (`pcb/bbase.3dshapes/MYOUNG_MY-AAA-01.step`, from
   LCSC/EasyEDA, no licence stated) may stay in the repository, or is fetched locally by
   `tools/import_leaf_model.py`.
-- [ ] Verify with datasheets and samples: see [docs/design.md § 7](docs/design.md#7-open-points-to-verify) (TPS3840
-  open-drain output above VDD, TPS61023 shutdown current and EN, the MY-AAA-01 pin spacing and spring travel, the
-  off-state current of a real board) and [enclosure/README.md](enclosure/README.md#assumptions-to-verify).
-- [ ] Order with the P1-BASE v3 prototype (JLCPCB, around 8 December 2026). The cart holds the BatteryBASE as
-  quoted on 16 November 2026: 5 boards, PCBA on both sides (€ 136.51; placement preview checked, the MY-AAA-01
-  corrected with `JLC_CORR`), and one printed set (tray, lid, cradle; $ 4.57). Raise the number of printed sets if
-  more than one board gets an enclosure. Check the DFM result for the 1.5 mm contact pins in the 1.6 mm board after
-  ordering.
+- [ ] Verify on the first board and with samples: see [docs/design.md § 7](docs/design.md#7-open-points-to-verify)
+  (SW overshoot, a module with cells but not on a CoreInk, the MY-AAA-01 pin spacing, spring travel and solder
+  joints, the off-state current, the charge current) and
+  [enclosure/README.md](enclosure/README.md#assumptions-to-verify).
+- [ ] Order with the P1-BASE v3 prototype (JLCPCB, around 8 December 2026). Re-quoted on 17 November 2026 with the
+  review fixes: 5 boards, PCBA on both sides, LF-HASL (€ 139.93; F1 is now the Brightking SMD0805B050TF, C269104,
+  because the JK-SMD0805-050 was out of stock), and one printed set (tray, lid, cradle; $ 4.57) plus the spare lid
+  `battery-base-lid-loose` ($ 1.46). **The cart still holds the 16 November version** (OSP, old BOM): remove it and
+  add the new quote, with the order remark from [README § Printed Circuit Board](README.md#printed-circuit-board).
+  Raise the number of printed sets if more than one board gets an enclosure. Check the DFM result for the 1.5 mm
+  contact pins in the 1.6 mm board after ordering.
 - [ ] After the print: check the leaf contacts with real cells (contact force, the leaf's top clear of the cradle's
   rib), the cradle bars (each cell must lie flat in its lane), the thin left wall, the sliding fit and click. If
   cells rattle under the lid: a strip of felt or soft foam (1–1.5 mm) on the lid's underside between the cradle's end

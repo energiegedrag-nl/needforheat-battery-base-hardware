@@ -108,7 +108,7 @@ def write_custom_lib():
     det = _box_symbol(
         "TPS3840DL", "U", "TPS3840DL", "Package_TO_SOT_SMD:SOT-23-5",
         "Nano-power voltage detector, 300 nA, monitors its own VDD; open-drain ~{RESET} low when VDD < VIT- "
-        "(released at VIT+ = VIT- + 200 mV), TI TPS3840DLxx",
+        "(released at VIT+ = VIT- + 100 mV below 3.1 V, + 200 mV from 3.1 V), TI TPS3840DLxx",
         left=[("2", "VDD", "power_in"), ("4", "~{MR}", "input"), ("5", "CT", "passive")],
         right=[("1", "~{RESET}", "open_collector")],
         bottom=[("3", "GND", "power_in")], half_w=7.62)
@@ -142,7 +142,7 @@ SOT235 = "Package_TO_SOT_SMD:SOT-23-5"
 TP_FP = "TestPoint:TestPoint_Pad_D1.0mm"
 
 RES_LCSC = {"10k": "C25804", "20k": "C4184", "68k": "C23231", "100k": "C25803", "470k": "C23178", "1M": "C22935",
-            "10M": "C7250"}
+            "10M": "C7250", "4.7k": "C23162"}
 
 
 def R(ref, val, n1, n2):
@@ -179,7 +179,10 @@ PARTS = [
     CONTACT("BC4", True, "N23", "cell 2 bottom"),
     CONTACT("BC5", False, "N23", "cell 3 bottom"),
     CONTACT("BC6", True, "BAT_RAW", "cell 3 top"),
-    PMOS("Q1", "GND", "BAT_RAW", "VCELL"),
+    # F1: resettable fuse in the stack's + (a short anywhere on the board), before the reverse-polarity FET
+    dict(ref="F1", lib="Device:Polyfuse", value="0.5A", fp="Fuse:Fuse_0805_2012Metric", lcsc="C269104",
+         nets={"1": "BAT_RAW", "2": "BAT_F"}),
+    PMOS("Q1", "GND", "BAT_F", "VCELL"),
     C("C1", "10u", "VCELL", "GND"),
     # 2. boost to 4.7 V, only while charging (EN); load disconnect when off
     dict(ref="U1", lib="bbase:TPS61023", value="TPS61023DRL", fp="Package_TO_SOT_SMD:SOT-563", lcsc="C919459",
@@ -201,25 +204,25 @@ PARTS = [
     NMOS("Q8", "EN", "ISOG", "GND"),
     # 4. charge latch
     PMOS("Q2", "HOLDG", "ENP", "VCELL"),
-    R("R10", "10M", "VCELL", "HOLDG"),
+    R("R10", "1M", "VCELL", "HOLDG"),
     R("R11", "10k", "ENP", "EN"),
-    R("R12", "10M", "EN", "GND"),
+    R("R12", "1M", "EN", "GND"),
     R("R13", "1M", "EN", "HG"),
     C("C5", "100n", "HG", "GND"),
     NMOS("Q3", "HG", "HD", "GND"),
     R("R14", "100k", "HOLDG", "HD"),
     NMOS("Q4", "FORCE", "HD", "GND"),
-    R("R15", "1M", "FORCE", "GND"),
+    R("R15", "4.7k", "FORCE", "GND"),
     NMOS("Q5", "INHIBIT", "EN", "GND"),
-    R("R16", "1M", "INHIBIT", "GND"),
+    R("R16", "4.7k", "INHIBIT", "GND"),
     R("R17", "100k", "HG", "STDBY"),
     dict(ref="U3", lib="bbase:TPS3840DL", value="TPS3840DL35", fp=SOT235, lcsc="C2866251",
          nets={"2": "VLIPO", "4": None, "5": None, "1": "LOWBAT", "3": "GND"}),
     C("C6", "100n", "VLIPO", "GND"),
-    R("R18", "1M", "LOWBAT", "HOLDG"),
+    R("R18", "470k", "LOWBAT", "HOLDG"),
     dict(ref="U4", lib="bbase:TPS3840DL", value="TPS3840DL28", fp=SOT235, lcsc="C2066416",
          nets={"2": "VCELL", "4": None, "5": None, "1": "UVG", "3": "GND"}),
-    R("R19", "10M", "VCELL", "UVG"),
+    R("R19", "1M", "VCELL", "UVG"),
     PMOS("Q6", "UVG", "HOLDG", "VCELL"),
     # 5. firmware interface, powered only from the CoreInk's 3V3
     dict(ref="U5", lib="Analog_ADC:ADS1115IDGS", value="ADS1115", fp="Package_SO:MSOP-10_3x3mm_P0.5mm", lcsc="C37593",
@@ -231,7 +234,8 @@ PARTS = [
     NMOS("Q10", "V3V3", "DIVG", "GND"),
     R("R21", "100k", "DIVT", "AIN_CELL"),
     R("R22", "100k", "AIN_CELL", "GND"),
-    NMOS("Q11", "V3V3", "PROG", "AIN_PROG"),
+    R("R24", "100k", "PROGM", "PROG"),  # keeps Q11, TP4 and their tracks off the charger's PROG node
+    NMOS("Q11", "V3V3", "PROGM", "AIN_PROG"),
     R("R23", "1M", "AIN_PROG", "GND"),
     dict(ref="U6", lib="Interface_Expansion:PCA9536D", value="PCA9536", fp="Package_SO:VSSOP-8_3x3mm_P0.65mm",
          lcsc="C2649389", nets={"1": "INHIBIT", "2": "FORCE", "3": None, "4": "GND", "5": None, "6": "SCL", "7": "SDA",
@@ -243,8 +247,8 @@ PARTS = [
                "G14": None, "G21": "SDA", "G22": "SCL", "G18": None, "G36": None, "G34": None, "G26": None,
                "G23": None, "G25": None}),
     # 7. test points, peg holes
-    TP("TP1", "VCELL"), TP("TP2", "V5B"), TP("TP3", "EN"), TP("TP4", "PROG"), TP("TP5", "GND"),
-] + [dict(ref=f"H{i}", lib="Mechanical:MountingHole", value="Peg hole 2.2 mm", fp="bbase:PegHole_2.2mm_NPTH",
+    TP("TP1", "VCELL"), TP("TP2", "V5B"), TP("TP3", "EN"), TP("TP4", "PROGM"), TP("TP5", "GND"),
+] + [dict(ref=f"H{i}", lib="Mechanical:MountingHole", value="Peg hole 2.4 mm", fp="bbase:PegHole_2.4mm_NPTH",
           lcsc="", nets={}, bom=False) for i in (1, 2, 3)]
 
 
@@ -355,7 +359,7 @@ class Sheet:
         # KiCad keeps text readable, which mirrors the justification for rotation 90/180 and for mirror y
         flip = (rot in (90, 180)) != (mirror == "y")
         L, Rj = ("right", "left") if flip else ("left", "right")
-        two = lid in ("Device:R", "Device:C", "Device:L")
+        two = lid in ("Device:R", "Device:C", "Device:L", "Device:Polyfuse")
         diode = lid in ("Device:LED", "Device:D_TVS", "Device:D_Zener", "Diode:1N5819WS")
         hide_val = lid == "Connector:TestPoint"
         right = [((X + 2.54, Y - 0.635), L), ((X + 2.54, Y + 1.905), L)]
@@ -543,19 +547,22 @@ def draw(s):
     s.wire("BC1.1", (33.02, 29.21), (45.72, 29.21), (58.42, 29.21), "BC3.1", first="v")
     s.wire("BC4.1", (58.42, 76.2), (71.12, 76.2), (83.82, 76.2), "BC5.1", first="v")
     s.place("Q1", 101.6, 34.29, rot=90, side="left")
-    s.wire("BC6.1", (83.82, 31.75), (91.44, 31.75), "Q1.3", first="v")
+    s.place("F1", 90.17, 31.75, rot=90)
+    s.wire("BC6.1", (83.82, 31.75), "F1.1", first="v")
+    s.wire("F1.2", "Q1.3")
     s.wire("Q1.2", (114.3, 31.75))
     s.power("VCELL", (114.3, 31.75))
     s.place("C1", 114.3, 40.64)
     s.wire((114.3, 31.75), "C1.1")
     gnd(s, "C1.2")
     gnd(s, "Q1.1")
-    for name, pt in (("N12", (45.72, 29.21)), ("N23", (71.12, 76.2)), ("BAT_RAW", (91.44, 31.75))):
+    for name, pt in (("N12", (45.72, 29.21)), ("N23", (71.12, 76.2)), ("BAT_RAW", (83.82, 31.75)), ("BAT_F", "Q1.3")):
         s.label(name, pt, "r", 1.0)
     notes(s, 20.32, 91.44, [
         "Three AAA cells in series. Contacts: six MYOUNG MY-AAA-01 leaf",
         "contacts (THT, two pins each) on the PCB's back side; the cells lie",
         "on their feet. Polarity is printed on the PCB under each cell.",
+        "F1: resettable fuse (0.5 A hold) against a short on the board.",
         "Q1: reverse-polarity protection (pack in backwards).",
         "VCELL 2.7 ... 4.8 V (alkaline), 3.0 ... 4.2 V (NiMH).",
         "Nothing draws from the cells while not charging except U4 and",
@@ -720,7 +727,7 @@ def draw(s):
         "and Q7 off. The latch draws nothing (FET gates).",
         "On: Q2 pulls EN up (R11). EN holds Q3 on through",
         "R13 (C5: 0.1 s); Q3 keeps Q2's gate low (R14).",
-        "Set: a FORCE pulse from the firmware (Q4), or U3",
+        "Set: a FORCE pulse (>= 300 ms) from the firmware (Q4), or U3",
         "when the LiPo is below 3.5 V (released at 3.7 V,",
         "well under full).",
         "Reset: ~STDBY (done) pulls HG low through R17;",
@@ -732,7 +739,7 @@ def draw(s):
         "0.1 uA (cells). Simulated: docs/simulation."])
     notes(s, 20.32, 228.6, [
         "U3 TPS3840DL35: safety net for a CoreInk without BatteryBASE firmware. The normal start is the firmware's FORCE pulse below",
-        "about 3.95 V: no 3.9 V detector is in stock, and the 4.0 V TPS3840 would release only at about 4.2 V (200 mV hysteresis)."])
+        "about 3.95 V: no 3.9 V detector is in stock, and the 4.0 V TPS3840 would release only at about 4.2 V (200 mV hysteresis above 3.1 V)."])
 
     # 5 ---------------------------------------------------------------------
     s.block("5  Firmware interface (I2C), powered only from the CoreInk's 3V3", 256.54, 127.0, 405.13, 246.38)
@@ -774,8 +781,11 @@ def draw(s):
     s.label("DIVT", "R21.1", "r", 1.0)
     # PROG switched by the 3V3 rail
     s.place("Q11", 342.9, 190.5)
-    s.wire("Q11.3", (345.44, 182.88), (350.52, 182.88), first="v")
-    s.label("PROG", (350.52, 182.88), "r")
+    s.place("R24", 351.79, 182.88, rot=90)
+    s.wire("Q11.3", (345.44, 182.88), "R24.1", first="v")
+    s.wire("R24.2", (360.68, 182.88))
+    s.label("PROG", (360.68, 182.88), "r")
+    s.label("PROGM", (345.44, 182.88), "u", 1.0)
     s.wire("Q11.1", (332.74, 190.5))
     s.power("V3V3", (332.74, 190.5))
     s.place("R23", 345.44, 199.39)
@@ -795,11 +805,11 @@ def draw(s):
     s.stub("U6.1", "INHIBIT", 7.62, "r")
     s.stub("U6.2", "FORCE", 7.62, "r")
     notes(s, 261.62, 223.52, [
-        "U5 ADS1115 (0x48): AIN0 = VCELL / 2 through Q9 (on only with 3V3); AIN1 = PROG through Q11.",
-        "U6 PCA9536 (0x41): IO0 = INHIBIT, IO1 = FORCE (pulse), to block 4; 1M pull-downs there.",
+        "U5 ADS1115 (0x48): AIN0 = VCELL / 2 through Q9 (on only with 3V3); AIN1 = PROG through R24, Q11.",
+        "U6 PCA9536 (0x41): IO0 = INHIBIT, IO1 = FORCE (pulse), to block 4; 4.7k pull-downs there (U6 powers up with 100k pull-ups).",
         "With the CoreInk off, U5, U6 and Q9-Q11 are off: nothing from the cells, and no pin can",
         "feed the unpowered CoreInk (FET gates, or nodes at 0 V). No I2C pull-ups: the CoreInk has them.",
-        "Firmware: cells = 2 x AIN0; charge current = 60 mA x AIN1 / 1.0 V; FORCE starts a charge."])
+        "Firmware: cells = 2 x AIN0; charge current = 60 mA x AIN1 / 0.91 V (R24/R23); FORCE starts a charge."])
 
     # 6 ---------------------------------------------------------------------
     s.block("6  CoreInk bus", 15.24, 250.19, 121.92, 284.48)
@@ -815,7 +825,7 @@ def draw(s):
 
     # 7 ---------------------------------------------------------------------
     s.block("7  Test points, peg holes, ERC flags", 127.0, 250.19, 287.02, 284.48)
-    for i, (tp, net) in enumerate([("TP1", "VCELL"), ("TP2", "V5B"), ("TP3", "EN"), ("TP4", "PROG"), ("TP5", "GND")]):
+    for i, (tp, net) in enumerate([("TP1", "VCELL"), ("TP2", "V5B"), ("TP3", "EN"), ("TP4", "PROGM"), ("TP5", "GND")]):
         x = 134.62 + 15.24 * i
         s.place(tp, x, 265.43)
         if net == "GND":
