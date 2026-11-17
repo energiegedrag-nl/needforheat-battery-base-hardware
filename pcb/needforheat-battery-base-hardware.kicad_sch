@@ -389,6 +389,124 @@
 							(font
 								(size 1.27 1.27))))))
 			(embedded_fonts no))
+		(symbol "Device:Polyfuse"
+			(pin_numbers
+				(hide yes))
+			(pin_names
+				(offset 0))
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "F"
+				(at -2.54 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27))))
+			(property "Value" "Polyfuse"
+				(at 2.54 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27))))
+			(property "Footprint" ""
+				(at 1.27 -5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27))
+					(justify left)))
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27))))
+			(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27))))
+			(property "ki_keywords" "resettable fuse PTC PPTC polyfuse polyswitch"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27))))
+			(property "ki_fp_filters" "*polyfuse* *PTC*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27))))
+			(symbol "Polyfuse_0_1"
+				(polyline
+					(pts
+						(xy -1.524 2.54)
+						(xy -1.524 1.524)
+						(xy 1.524 -1.524)
+						(xy 1.524 -2.54))
+					(stroke
+						(width 0)
+						(type default))
+					(fill
+						(type none)))
+				(rectangle
+					(start -0.762 2.54)
+					(end 0.762 -2.54)
+					(stroke
+						(width 0.254)
+						(type default))
+					(fill
+						(type none)))
+				(polyline
+					(pts
+						(xy 0 2.54)
+						(xy 0 -2.54))
+					(stroke
+						(width 0)
+						(type default))
+					(fill
+						(type none))))
+			(symbol "Polyfuse_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27))))
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)))))
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27))))
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27))))))
+			(embedded_fonts no))
 		(symbol "bbase:VCELL"
 			(power global)
 			(pin_numbers
@@ -1536,7 +1654,7 @@
 					(font
 						(size 1.27 1.27))
 					(hide yes)))
-			(property "Description" "Nano-power voltage detector, 300 nA, monitors its own VDD; open-drain ~{RESET} low when VDD < VIT- (released at VIT+ = VIT- + 200 mV), TI TPS3840DLxx"
+			(property "Description" "Nano-power voltage detector, 300 nA, monitors its own VDD; open-drain ~{RESET} low when VDD < VIT- (released at VIT+ = VIT- + 100 mV below 3.1 V, + 200 mV from 3.1 V), TI TPS3840DLxx"
 				(at 0 0 0)
 				(effects
 					(font
@@ -3025,6 +3143,52 @@
 				(path "/315fc65c-46ba-5e78-9a9b-e2833cf153bb"
 					(reference "Q1")
 					(unit 1)))))
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 90.17 31.75 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e144dd03-fe9c-53aa-a157-6d4d05c186ff")
+		(property "Reference" "F1"
+			(at 90.17 29.84 90)
+			(effects
+				(font
+					(size 1.27 1.27))))
+		(property "Value" "0.5A"
+			(at 90.17 34.92 90)
+			(effects
+				(font
+					(size 1.27 1.27))))
+		(property "Footprint" "Fuse:Fuse_0805_2012Metric"
+			(at 90.17 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27))
+				(hide yes)))
+		(property "Datasheet" ""
+			(at 90.17 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27))
+				(hide yes)))
+		(property "LCSC" "C269104"
+			(at 90.17 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27))
+				(hide yes)))
+		(pin "1"
+			(uuid "b6578dc4-ba03-5c65-9b30-7d79ab885042"))
+		(pin "2"
+			(uuid "5e9baa95-b3fa-536b-94a5-866b8d1d6388"))
+		(instances
+			(project "needforheat-battery-base-hardware"
+				(path "/315fc65c-46ba-5e78-9a9b-e2833cf153bb"
+					(reference "F1")
+					(unit 1)))))
 	(wire
 		(pts
 			(xy 83.82 33.02)
@@ -3036,19 +3200,19 @@
 	(wire
 		(pts
 			(xy 83.82 31.75)
-			(xy 91.44 31.75))
+			(xy 86.36 31.75))
 		(stroke
 			(width 0)
 			(type default))
-		(uuid "1f3ff48a-39a8-5742-85f9-699912d77a74"))
+		(uuid "cf87019e-7cbc-5a8c-b3a5-121d4f94547d"))
 	(wire
 		(pts
-			(xy 91.44 31.75)
+			(xy 93.98 31.75)
 			(xy 96.52 31.75))
 		(stroke
 			(width 0)
 			(type default))
-		(uuid "7b875a08-96aa-57bb-9b1b-e8125c85a643"))
+		(uuid "224a9cb9-9697-58b6-b2aa-c060d766ce7a"))
 	(wire
 		(pts
 			(xy 106.68 31.75)
@@ -3263,12 +3427,19 @@
 			(justify left bottom))
 		(uuid "be9e3c79-fab3-533d-9235-27c06c0641be"))
 	(label "BAT_RAW"
-		(at 91.44 31.75 0)
+		(at 83.82 31.75 0)
 		(effects
 			(font
 				(size 1 1))
 			(justify left bottom))
-		(uuid "8cfa7f7c-d9cf-559b-baee-31386dc0b7a1"))
+		(uuid "0b1e4893-3e73-5cd7-b725-115e06623862"))
+	(label "BAT_F"
+		(at 96.52 31.75 0)
+		(effects
+			(font
+				(size 1 1))
+			(justify left bottom))
+		(uuid "80575820-8aa5-5e2c-bfca-97cad89ccf6f"))
 	(text "Three AAA cells in series. Contacts: six MYOUNG MY-AAA-01 leaf"
 		(exclude_from_sim no)
 		(at 20.32 91.44 0)
@@ -3293,38 +3464,46 @@
 				(size 1.27 1.27))
 			(justify left bottom))
 		(uuid "8879d5bd-5e32-513b-81f3-5f88bc0512fc"))
-	(text "Q1: reverse-polarity protection (pack in backwards)."
+	(text "F1: resettable fuse (0.5 A hold) against a short on the board."
 		(exclude_from_sim no)
 		(at 20.32 99.06 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "8a8db37f-5abc-5295-b556-34c0a4c11709"))
-	(text "VCELL 2.7 ... 4.8 V (alkaline), 3.0 ... 4.2 V (NiMH)."
+		(uuid "ac64c424-7d24-59e9-a397-5c5f26f322ee"))
+	(text "Q1: reverse-polarity protection (pack in backwards)."
 		(exclude_from_sim no)
 		(at 20.32 101.6 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "101e81d0-bec8-587c-86fd-be330dc24ff1"))
-	(text "Nothing draws from the cells while not charging except U4 and"
+		(uuid "0ce531f1-4550-515d-95a4-a701cbb51e4a"))
+	(text "VCELL 2.7 ... 4.8 V (alkaline), 3.0 ... 4.2 V (NiMH)."
 		(exclude_from_sim no)
 		(at 20.32 104.14 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "ccb8d66d-21d0-5cf1-b6dd-d319c3c1d83a"))
-	(text "U1 in shutdown: about 0.4 uA."
+		(uuid "0106fb08-8aec-547e-a392-d75cc74f1566"))
+	(text "Nothing draws from the cells while not charging except U4 and"
 		(exclude_from_sim no)
 		(at 20.32 106.68 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "124c5a4b-cf64-5999-998c-0fbffa11e568"))
+		(uuid "72f2c767-dd1d-5097-a9f8-e44982d706e6"))
+	(text "U1 in shutdown: about 0.4 uA."
+		(exclude_from_sim no)
+		(at 20.32 109.22 0)
+		(effects
+			(font
+				(size 1.27 1.27))
+			(justify left bottom))
+		(uuid "2a7cc302-26e6-59ce-9217-3fe678ae108c"))
 	(rectangle
 		(start 127 15.24)
 		(end 236.22 121.92)
@@ -5090,7 +5269,7 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "10M"
+		(property "Value" "1M"
 			(at 48.26 142.88 0)
 			(effects
 				(font
@@ -5108,7 +5287,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C7250"
+		(property "LCSC" "C22935"
 			(at 45.72 140.97 0)
 			(effects
 				(font
@@ -5247,7 +5426,7 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "10M"
+		(property "Value" "1M"
 			(at 88.9 158.12 0)
 			(effects
 				(font
@@ -5265,7 +5444,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C7250"
+		(property "LCSC" "C22935"
 			(at 86.36 156.21 0)
 			(effects
 				(font
@@ -5528,7 +5707,7 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "1M"
+		(property "Value" "4.7k"
 			(at 124.46 163.19 0)
 			(effects
 				(font
@@ -5546,7 +5725,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C22935"
+		(property "LCSC" "C23162"
 			(at 121.92 161.29 0)
 			(effects
 				(font
@@ -6051,7 +6230,7 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "1M"
+		(property "Value" "4.7k"
 			(at 45.72 173.35 0)
 			(effects
 				(font
@@ -6069,7 +6248,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C22935"
+		(property "LCSC" "C23162"
 			(at 43.18 171.45 0)
 			(effects
 				(font
@@ -6519,7 +6698,7 @@
 			(effects
 				(font
 					(size 1.27 1.27))))
-		(property "Value" "1M"
+		(property "Value" "470k"
 			(at 71.12 206.38 90)
 			(effects
 				(font
@@ -6536,7 +6715,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C22935"
+		(property "LCSC" "C23178"
 			(at 71.12 203.2 0)
 			(effects
 				(font
@@ -6757,7 +6936,7 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "10M"
+		(property "Value" "1M"
 			(at 143.51 201.29 0)
 			(effects
 				(font
@@ -6775,7 +6954,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "LCSC" "C7250"
+		(property "LCSC" "C22935"
 			(at 140.97 199.39 0)
 			(effects
 				(font
@@ -7005,14 +7184,14 @@
 				(size 1.27 1.27))
 			(justify left bottom))
 		(uuid "68769e2c-faf3-52f0-a01c-9a0129725b78"))
-	(text "Set: a FORCE pulse from the firmware (Q4), or U3"
+	(text "Set: a FORCE pulse (>= 300 ms) from the firmware (Q4), or U3"
 		(exclude_from_sim no)
 		(at 172.72 147.32 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "7f24eb86-dc7d-5a8b-acbe-2c1fa2b4f057"))
+		(uuid "76498a9e-6a52-5a3a-b086-3a5002646ed6"))
 	(text "when the LiPo is below 3.5 V (released at 3.7 V,"
 		(exclude_from_sim no)
 		(at 172.72 149.86 0)
@@ -7093,7 +7272,7 @@
 				(size 1.27 1.27))
 			(justify left bottom))
 		(uuid "aec6edcb-130c-5300-8b37-59a8aead4263"))
-	(text "about 3.95 V: no 3.9 V detector is in stock, and the 4.0 V TPS3840 would release only at about 4.2 V (200 mV hysteresis)."
+	(text "about 3.95 V: no 3.9 V detector is in stock, and the 4.0 V TPS3840 would release only at about 4.2 V (200 mV hysteresis above 3.1 V)."
 		(exclude_from_sim no)
 		(at 20.32 231.14 0)
 		(effects
@@ -8127,6 +8306,52 @@
 				(path "/315fc65c-46ba-5e78-9a9b-e2833cf153bb"
 					(reference "Q11")
 					(unit 1)))))
+	(symbol
+		(lib_id "Device:R")
+		(at 351.79 182.88 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f6379edc-af90-5f32-b5ef-ae8b05717a0e")
+		(property "Reference" "R24"
+			(at 351.79 180.97 90)
+			(effects
+				(font
+					(size 1.27 1.27))))
+		(property "Value" "100k"
+			(at 351.79 186.06 90)
+			(effects
+				(font
+					(size 1.27 1.27))))
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 351.79 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27))
+				(hide yes)))
+		(property "Datasheet" ""
+			(at 351.79 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27))
+				(hide yes)))
+		(property "LCSC" "C25803"
+			(at 351.79 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27))
+				(hide yes)))
+		(pin "1"
+			(uuid "783e8621-6338-59c8-886d-69588a6047d9"))
+		(pin "2"
+			(uuid "1c2dd7b9-668a-5dbe-acc8-74c6cd1256b1"))
+		(instances
+			(project "needforheat-battery-base-hardware"
+				(path "/315fc65c-46ba-5e78-9a9b-e2833cf153bb"
+					(reference "R24")
+					(unit 1)))))
 	(wire
 		(pts
 			(xy 345.44 185.42)
@@ -8138,18 +8363,33 @@
 	(wire
 		(pts
 			(xy 345.44 182.88)
-			(xy 350.52 182.88))
+			(xy 347.98 182.88))
 		(stroke
 			(width 0)
 			(type default))
-		(uuid "a5a86abd-2206-555e-9649-5a685fa231a1"))
+		(uuid "469da96f-02ef-5707-97d3-854f69c78075"))
+	(wire
+		(pts
+			(xy 355.6 182.88)
+			(xy 360.68 182.88))
+		(stroke
+			(width 0)
+			(type default))
+		(uuid "6eb3d366-9d77-583d-83d8-c1d356a59b97"))
 	(label "PROG"
-		(at 350.52 182.88 0)
+		(at 360.68 182.88 0)
 		(effects
 			(font
 				(size 1.27 1.27))
 			(justify left bottom))
-		(uuid "c0cdbba5-9ab2-5f52-92da-b98cebdbf275"))
+		(uuid "2e1b69f5-30b4-58db-8882-07b4678e17e6"))
+	(label "PROGM"
+		(at 345.44 182.88 90)
+		(effects
+			(font
+				(size 1 1))
+			(justify left bottom))
+		(uuid "a546f0ce-c36b-5ad7-9c90-e294ea5c1420"))
 	(wire
 		(pts
 			(xy 337.82 190.5)
@@ -8633,7 +8873,7 @@
 				(size 1.27 1.27))
 			(justify left bottom))
 		(uuid "31cda539-6ab2-5e30-aa60-c6ffa1f124b2"))
-	(text "U5 ADS1115 (0x48): AIN0 = VCELL / 2 through Q9 (on only with 3V3); AIN1 = PROG through Q11."
+	(text "U5 ADS1115 (0x48): AIN0 = VCELL / 2 through Q9 (on only with 3V3); AIN1 = PROG through R24, Q11."
 		(exclude_from_sim no)
 		(at 261.62 223.52 0)
 		(effects
@@ -8641,7 +8881,7 @@
 				(size 1.27 1.27))
 			(justify left bottom))
 		(uuid "5bf0c33b-84ed-53d1-8a00-87d885a16621"))
-	(text "U6 PCA9536 (0x41): IO0 = INHIBIT, IO1 = FORCE (pulse), to block 4; 1M pull-downs there."
+	(text "U6 PCA9536 (0x41): IO0 = INHIBIT, IO1 = FORCE (pulse), to block 4; 4.7k pull-downs there (U6 powers up with 100k pull-ups)."
 		(exclude_from_sim no)
 		(at 261.62 226.06 0)
 		(effects
@@ -8665,7 +8905,7 @@
 				(size 1.27 1.27))
 			(justify left bottom))
 		(uuid "f056c00d-4af6-5532-a5a8-50ea853fcb3d"))
-	(text "Firmware: cells = 2 x AIN0; charge current = 60 mA x AIN1 / 1.0 V; FORCE starts a charge."
+	(text "Firmware: cells = 2 x AIN0; charge current = 60 mA x AIN1 / 0.91 V (R24/R23); FORCE starts a charge."
 		(exclude_from_sim no)
 		(at 261.62 233.68 0)
 		(effects
@@ -9246,7 +9486,7 @@
 			(effects
 				(font
 					(size 1.27 1.27))))
-		(property "Value" "PROG"
+		(property "Value" "PROGM"
 			(at 180.34 257.81 0)
 			(effects
 				(font
@@ -9279,13 +9519,13 @@
 			(width 0)
 			(type default))
 		(uuid "7c53a4b8-e46b-52c8-8fac-b372fc6c9372"))
-	(label "PROG"
+	(label "PROGM"
 		(at 180.34 269.24 0)
 		(effects
 			(font
 				(size 1 1))
 			(justify left bottom))
-		(uuid "c7d2f7d7-fc8a-59c1-aa4c-7ff34037041c"))
+		(uuid "0f622bef-e657-541e-a479-6ca0d14ef6ee"))
 	(symbol
 		(lib_id "Connector:TestPoint")
 		(at 195.58 265.43 0)
@@ -9388,13 +9628,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "Peg hole 2.2 mm"
+		(property "Value" "Peg hole 2.4 mm"
 			(at 138.43 281.3 0)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Footprint" "bbase:PegHole_2.2mm_NPTH"
+		(property "Footprint" "bbase:PegHole_2.4mm_NPTH"
 			(at 134.62 279.4 0)
 			(effects
 				(font
@@ -9426,13 +9666,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "Peg hole 2.2 mm"
+		(property "Value" "Peg hole 2.4 mm"
 			(at 158.75 281.3 0)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Footprint" "bbase:PegHole_2.2mm_NPTH"
+		(property "Footprint" "bbase:PegHole_2.4mm_NPTH"
 			(at 154.94 279.4 0)
 			(effects
 				(font
@@ -9464,13 +9704,13 @@
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Value" "Peg hole 2.2 mm"
+		(property "Value" "Peg hole 2.4 mm"
 			(at 179.07 281.3 0)
 			(effects
 				(font
 					(size 1.27 1.27))
 				(justify left)))
-		(property "Footprint" "bbase:PegHole_2.2mm_NPTH"
+		(property "Footprint" "bbase:PegHole_2.4mm_NPTH"
 			(at 175.26 279.4 0)
 			(effects
 				(font

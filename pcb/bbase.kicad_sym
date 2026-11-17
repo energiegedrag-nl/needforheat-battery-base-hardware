@@ -283,7 +283,7 @@
 				(font
 					(size 1.27 1.27))
 				(hide yes)))
-		(property "Description" "Nano-power voltage detector, 300 nA, monitors its own VDD; open-drain ~{RESET} low when VDD < VIT- (released at VIT+ = VIT- + 200 mV), TI TPS3840DLxx"
+		(property "Description" "Nano-power voltage detector, 300 nA, monitors its own VDD; open-drain ~{RESET} low when VDD < VIT- (released at VIT+ = VIT- + 100 mV below 3.1 V, + 200 mV from 3.1 V), TI TPS3840DLxx"
 			(at 0 0 0)
 			(effects
 				(font

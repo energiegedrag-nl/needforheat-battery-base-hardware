@@ -52,6 +52,24 @@ FIXED = {
     # from the back), 36.87 mm from the top edge
     "J1": (6.03, 36.87, 0),
 }
+# The boost converter, placed by hand as in TI's layout example (TPS61023 datasheet, Layout): the output capacitor
+# C2 right at VOUT (pin 6) and GND (pin 4), straddling the short SW track from pin 5 to L1 (turned so that its SW pad
+# faces U1); C1 at VIN (pin 3) and GND; the FB divider R1/R2 at pin 1, on the side away from SW and L1. Clear of the
+# contacts' feet on the other side: the GND vias land in the gap between BC3 and BC1. C3 stays at the charger.
+BOOST = {"U1": (27.3, 9.6, 0), "C2": (29.55, 9.6, 270), "L1": (32.4, 9.6, 180), "C1": (27.35, 12.4, 0),
+         "R1": (27.6, 7.1, 180), "R2": (24.6, 7.65, 180)}
+FIXED.update(BOOST)
+FIXED["F1"] = (12.12, 18.2, 0)  # the fuse right at the stack's + (BC6's inner pin), so it covers all of the board
+# copper of the boost's hot loop, laid before routing and locked: (net, width, F.Cu points); vias (net, x, y)
+BOOST_TRACKS = [("/SW", 0.25, [(28.015, 9.6), (28.8, 9.6)]), ("/SW", 0.4, [(28.8, 9.6), (31.25, 9.6)]),
+                ("V5B", 0.3, [(28.2, 9.0), (28.9, 8.65)]),
+                ("V5B", 0.3, [(28.425, 7.1), (29.3, 7.9), (29.3, 8.65)]),
+                ("GND", 0.3, [(28.2, 10.2), (28.9, 10.55)]),
+                ("GND", 0.4, [(29.3, 10.55), (29.3, 12.05)]),
+                ("GND", 0.4, [(28.3, 12.4), (28.3, 13.75)]),
+                ("VCELL", 0.3, [(26.5, 10.15), (26.4, 11.9)]),
+                ("/FB", 0.25, [(26.5, 9.0), (26.775, 8.5), (26.775, 7.1)]), ("/FB", 0.25, [(26.775, 7.65), (25.425, 7.65)])]
+BOOST_VIAS = [("GND", 29.3, 12.05), ("GND", 28.3, 13.75)]
 # kuip pegs (NPTH) at three of the four LEGO-hole axes, mirrored from the enclosure frame (seen from the back):
 # (36, 4), (4, 52), (36, 52) there (enclosure/kuip.py PEGS), as on the P1-BASE v3. The corner without a peg keys the PCB
 PEGS = [(4.0, 4.0), (36.0, 52.0), (4.0, 52.0)]
@@ -60,7 +78,7 @@ CORNER_BLOCK = 7.0  # the tray's corner blocks reach 7 mm in from the outline co
 # Blocks for the SMD parts (top side): rectangle (x1, y1, x2, y2) and the parts, packed in rows
 BLOCKS = [
     # power: boost, charger, isolation (right half seen from the CoreInk side)
-    ((19.6, 7.6, 37.55, 27.4), ["U1", "L1", "C1", "Q1", "R1", "R2", "C2", "C3", "U2", "R3", "C4"]),
+    ((19.6, 7.6, 37.55, 27.4), ["Q1", "C3", "U2", "R3", "R24", "C4"]),
     # charge latch, and the isolation switch Q7/R9/Q8 (the leaf contacts' pins take room in the block above)
     ((19.6, 27.8, 37.55, 48.4), ["Q7", "R9", "Q8", "Q2", "R10", "R11", "R12", "R13", "C5", "Q3", "R14", "Q4", "R15",
                                  "Q5", "R16", "R17"]),
@@ -215,6 +233,57 @@ def add_zone(b, net, layer):
     b.Add(z)
 
 
+def foot_outlines(b, grow=0.3):
+    """Outline of each contact's foot on the board (the tab behind the leaf and the foot under the cell's end, from
+    the footprint: tab 2.33 wide from y = -2.66, foot 6.35 wide from y = -1.15 to 12.91), grown by `grow`."""
+    out = []
+    for f in b.GetFootprints():
+        if not f.GetReference().startswith("BC"):
+            continue
+        pins = sorted((p.GetPosition() for p in f.Pads() if p.GetAttribute() == pcbnew.PAD_ATTRIB_PTH),
+                      key=lambda q: (q.x, q.y))
+        o = f.GetPosition()  # the outer pin
+        i = next(q for q in pins if (q - o).EuclideanNorm() > MM(5))
+        ux, uy = (i.x - o.x) / MM(10.25), (i.y - o.y) / MM(10.25)
+        vx, vy = -uy, ux
+        g = grow
+        local = [(-1.165 - g, -2.66 - g), (1.165 + g, -2.66 - g), (1.165 + g, -1.15 - g), (3.175 + g, -1.15 - g),
+                 (3.175 + g, 12.91 + g), (-3.175 - g, 12.91 + g), (-3.175 - g, -1.15 - g), (-1.165 - g, -1.15 - g)]
+        out.append((f.GetReference(), [(o.x + MM(a) * vx + MM(c) * ux, o.y + MM(a) * vy + MM(c) * uy) for a, c in local]))
+    return out
+
+
+def add_foot_keepouts(b):
+    """A rule area under each contact's foot on the cell side (B.Cu): no tracks, vias or pour of any net. The foot
+    is a stamped steel part pressed onto the board by the cell; it must not rest on solder mask over other copper
+    (a worn mask would short a cell). Its own pads are not affected."""
+    for ref, pts in foot_outlines(b):
+        z = pcbnew.ZONE(b)
+        z.SetIsRuleArea(True)
+        z.SetZoneName("foot " + ref)
+        z.SetDoNotAllowTracks(True); z.SetDoNotAllowVias(True); z.SetDoNotAllowZoneFills(True)
+        z.SetDoNotAllowPads(False); z.SetDoNotAllowFootprints(False)
+        z.SetLayer(pcbnew.B_Cu)
+        o = z.Outline(); o.NewOutline()
+        for x, y in pts:
+            o.Append(int(x), int(y))
+        b.Add(z)
+
+
+def add_boost_tracks(b, lock=True):
+    for net, w, pts in BOOST_TRACKS:
+        n = b.FindNet(net)
+        for a, e in zip(pts, pts[1:]):
+            t = pcbnew.PCB_TRACK(b)
+            t.SetStart(P(*a)); t.SetEnd(P(*e)); t.SetWidth(MM(w)); t.SetLayer(pcbnew.F_Cu); t.SetNet(n)
+            t.SetLocked(lock)
+            b.Add(t)
+    for net, x, y in BOOST_VIAS:
+        v = pcbnew.PCB_VIA(b)
+        v.SetPosition(P(x, y)); v.SetWidth(MM(0.6)); v.SetDrill(MM(0.3)); v.SetNet(b.FindNet(net)); v.SetLocked(lock)
+        b.Add(v)
+
+
 VARIANT = int(os.environ.get("BBASE_VARIANT", "0"))  # rotates the packing order inside block 2
 
 
@@ -262,16 +331,42 @@ def cell_marks(b, cons):
         add_text(b, "AAA", x, (y0 + y1) / 2, 1.2, layer=pcbnew.B_SilkS, angle=90)
 
 
+# Power track width: 0.35 mm (1 oz copper carries about 1 A, the cells deliver about 0.3 A). 0.5 mm did not fit
+# between the pads of the small parts: Freerouting left 18 connections open.
+POWER_W = float(os.environ.get("BBASE_POWER_W", "0.35"))
+POWER_NETS = ("/BAT_RAW", "/BAT_F", "VCELL", "V5B", "/TPBAT", "VLIPO", "/N12", "/N23")
+
+
+def write_netclasses():
+    """Net classes into the project file (Default 0.2 mm, Power POWER_W with its nets), before pcbnew loads it."""
+    import json
+    pro = os.path.join(PCBDIR, NAME + ".kicad_pro")
+    d = json.load(open(pro, encoding="utf8"))
+    ns = d["net_settings"]
+    base = next(c for c in ns["classes"] if c["name"] == "Default")
+    base.update(track_width=0.2, clearance=0.2, via_diameter=0.6, via_drill=0.3)
+    power = dict(base, name="Power", track_width=POWER_W, priority=0)
+    ns["classes"] = [base, power]
+    ns["netclass_patterns"] = [{"netclass": "Power", "pattern": n} for n in POWER_NETS]
+    with open(pro, "w", encoding="utf8", newline="\n") as f:
+        json.dump(d, f, indent=2)
+        f.write("\n")
+
+
 def set_netclasses(b):
-    """Wider tracks for the power path (up to about 0.3 A from the cells); 0.3 mm, as wide as the 0.5 mm pitch
-    pins of U1 (SOT-563)."""
+    """Wider tracks for the power path (up to about 0.3 A from the cells): POWER_W. The pins of U1 (SOT-563, 0.5 mm
+    pitch) are connected by the hand-laid BOOST_TRACKS. Signals 0.2 mm: a 0.3 mm track cannot leave a middle pin of
+    U5 (MSOP-10, 0.5 mm pitch) with 0.2 mm clearance to its neighbours. The net classes live in the .kicad_pro: they
+    are also written there (write_netclasses), as pcbnew's SaveBoard does not."""
     ds = b.GetDesignSettings()
     ns = ds.m_NetSettings
+    dflt = ns.GetDefaultNetclass()
+    dflt.SetTrackWidth(MM(0.2)); dflt.SetClearance(MM(0.2)); dflt.SetViaDiameter(MM(0.6)); dflt.SetViaDrill(MM(0.3))
     try:
         nc = pcbnew.NETCLASS("Power")
-        nc.SetTrackWidth(MM(0.3)); nc.SetClearance(MM(0.2)); nc.SetViaDiameter(MM(0.6)); nc.SetViaDrill(MM(0.3))
+        nc.SetTrackWidth(MM(POWER_W)); nc.SetClearance(MM(0.2)); nc.SetViaDiameter(MM(0.6)); nc.SetViaDrill(MM(0.3))
         ns.SetNetclass("Power", nc)
-        for net in ("BAT_RAW", "VCELL", "SW", "V5B", "TPBAT", "VLIPO", "N12", "N23"):
+        for net in POWER_NETS:
             ns.SetNetclassPatternAssignment(net, "Power")
         ns.RecomputeEffectiveNetclasses()
     except Exception as e:  # older pcbnew API
@@ -290,7 +385,7 @@ def build(route=True):
     ds.m_CopperEdgeClearance = MM(0.3)
     ns = ds.m_NetSettings
     dflt = ns.GetDefaultNetclass()
-    dflt.SetTrackWidth(MM(0.3)); dflt.SetClearance(MM(0.2)); dflt.SetViaDiameter(MM(0.6)); dflt.SetViaDrill(MM(0.3))
+    dflt.SetTrackWidth(MM(0.2)); dflt.SetClearance(MM(0.2)); dflt.SetViaDiameter(MM(0.6)); dflt.SetViaDrill(MM(0.3))
     add_outline(b)
     fps = {}
     for ref, c in sorted(comps.items()):
@@ -367,9 +462,12 @@ def build(route=True):
     add_zone(b, netobj["GND"], pcbnew.F_Cu)
     add_zone(b, netobj["GND"], pcbnew.B_Cu)
     add_edge_keepout(b)
+    add_foot_keepouts(b)
+    add_boost_tracks(b)
     fanout_gnd(b)
     b.BuildConnectivity()
     pcbnew.SaveBoard(out, b)
+    write_netclasses()  # after SaveBoard, which may write the project file with what it has in memory
     print("placed board saved:", out)
     if route:
         autoroute(out)
@@ -862,6 +960,207 @@ def move_contacts(path, route=True, clr=0.25, rip_nets=(), move=True):
         os.remove(f)
     print("re-routed board saved:", path)
 
+# parts placed at a fixed spot by update_board() on an already routed board (in build() they are packed in a block)
+UPDATE_PLACE = {"R24": (21.12, 24.75, 0)}
+
+
+def remove_stubs(b):
+    """Tracks (not GND, whose ends may rest in the pour) with an end on nothing, and vias that lead nowhere."""
+    gnd = b.FindNet("GND").GetNetCode()
+    removed = 0
+    while True:
+        ends = {}
+        for t in b.GetTracks():
+            for q in ((t.GetPosition(),) if isinstance(t, pcbnew.PCB_VIA) else (t.GetStart(), t.GetEnd())):
+                ends[(q.x, q.y)] = ends.get((q.x, q.y), 0) + 1
+        allpads = [p for f in b.GetFootprints() for p in f.Pads()]
+        tracks = [o for o in b.GetTracks() if not isinstance(o, pcbnew.PCB_VIA)]
+        stubs = []
+        for t in b.GetTracks():
+            if t.GetNetCode() == gnd or t.IsLocked():
+                continue
+            if isinstance(t, pcbnew.PCB_VIA):
+                q = t.GetPosition()
+                if ends[(q.x, q.y)] < 3 and not any(p.GetNetCode() == t.GetNetCode() and p.HitTest(q) for p in allpads):
+                    stubs.append(t)
+                continue
+            for q in (t.GetStart(), t.GetEnd()):
+                if ends[(q.x, q.y)] < 2 and not any(p.GetNetCode() == t.GetNetCode() and p.HitTest(q) for p in allpads) \
+                        and not any(o is not t and o.GetNetCode() == t.GetNetCode() and o.IsOnLayer(t.GetLayer())
+                                    and o.HitTest(q, 0) for o in tracks):  # a T-junction is not a loose end
+                    stubs.append(t)
+                    break
+        if not stubs:
+            return removed
+        for t in stubs:
+            b.Delete(t)
+            removed += 1
+
+
+def route_rest(b, path):
+    """Lock every track and via on the board, let Freerouting route the missing connections, restore the locks."""
+    def key(t):
+        return (t.GetClass(), t.GetNetCode(), t.GetStart().x, t.GetStart().y, t.GetEnd().x, t.GetEnd().y)
+    was_locked = {key(t) for t in b.GetTracks() if t.IsLocked()}
+    keep = [key(t) for t in b.GetTracks()]
+    for t in b.GetTracks():
+        t.SetLocked(True)
+    dsn, ses = path[:-10] + ".dsn", path[:-10] + ".ses"
+    # The contacts' foot pads overlap their pins (connected for KiCad), but Freerouting takes every pad "1" of a
+    # BC footprint as a pin of its own and tries to wire them all together, under the foot where the rule area
+    # forbids it. Leave them out of the DSN: the rule area keeps other copper away from them anyway.
+    feet = [(f, p) for f in b.GetFootprints() if f.GetReference().startswith("BC")
+            for p in list(f.Pads()) if p.GetAttribute() == pcbnew.PAD_ATTRIB_SMD]
+    for f, p in feet:
+        f.Remove(p)
+    ok = pcbnew.ExportSpecctraDSN(b, dsn)
+    for f, p in feet:
+        f.Add(p)
+    if not ok:
+        raise SystemExit("DSN export failed")
+    cmd = [JAVA, "-Xmx" + os.environ.get("BBASE_JAVA_XMX", "1g"), "-jar", FREEROUTING, "-de", dsn, "-do", ses,
+           "-mp", os.environ.get("BBASE_PASSES", "20"), "-mt", "1", "--gui.enabled=false"]
+    print(" ".join(cmd))
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=int(os.environ.get("BBASE_ROUTE_TIMEOUT", "600")))
+    print(r.stdout[-2000:], r.stderr[-2000:])
+    if not os.path.exists(ses) or not pcbnew.ImportSpecctraSES(b, ses):
+        raise SystemExit("Freerouting produced no usable SES file")
+    after = {key(t) for t in b.GetTracks()}
+    lost = [k for k in keep if k not in after]
+    print(f"tracks/vias before {len(keep)}, after {len(after)}, of the locked ones lost: {len(lost)}")
+    for t in b.GetTracks():
+        t.SetLocked(key(t) in was_locked)
+    pcbnew.ZONE_FILLER(b).Fill(b.Zones())
+    pcbnew.SaveBoard(path, b)
+    fix_islands(path)
+    for f in (dsn, ses):
+        os.remove(f)
+    print("re-routed board saved:", path)
+
+
+def update_board(path, route=True, rip_nets=("/SW", "/FB", "V5B", "VCELL", "/EN", "/BAT_RAW", "/BAT_F", "/PROG",
+                                             "/PROGM", "/N12", "/N23", "/TPBAT", "VLIPO"), clr=0.25, rip_all=False):
+    """Bring a routed board up to date with the schematic and the generator without routing it all again: new
+    and changed footprints from the libraries (keeping their places), values, LCSC numbers and nets from the
+    netlist; the boost placed and wired by hand (BOOST, BOOST_TRACKS); the rule areas under the contacts' feet.
+    Ripped up: all tracks of rip_nets, everything in the way of a part that moved or is new, and every track or
+    via in a foot's rule area. Freerouting then routes only what is missing, with the rest locked.
+    rip_all: rip up every track of every net but GND (its fan-out stays), for when the locked remains of the old
+    routing leave Freerouting no way through."""
+    import json
+    comps, nets = netlist()
+    write_netclasses()
+    b = pcbnew.LoadBoard(path)
+    for name in nets:
+        if b.FindNet(name) is None:
+            b.Add(pcbnew.NETINFO_ITEM(b, name))
+    cons = json.load(open(CONTACTS_JSON, encoding="utf8"))
+    xs = sorted({c["x"] for c in cons["contacts"]})
+    contact_at = {CONTACT_REF[(xs.index(c["x"]) + 1, c["end"])]: c for c in cons["contacts"]}
+    moved = []
+    for ref, c in sorted(comps.items()):
+        old = b.FindFootprintByReference(ref)
+        lib, name = c["fp"].split(":", 1)
+        fresh = old is None or str(old.GetFPID().GetLibItemName()) != name or ref.startswith(("BC", "H"))
+        if fresh:
+            fp = load_fp(c["fp"])
+            fp.SetReference(ref)
+            fp.Reference().SetTextSize(pcbnew.VECTOR2I(MM(0.6), MM(0.6))); fp.Reference().SetTextThickness(MM(0.1))
+            fp.Reference().SetVisible(False)
+            if old is not None:
+                pos, rot, bottom = old.GetPosition(), old.GetOrientationDegrees(), old.GetLayer() == pcbnew.B_Cu
+                b.Delete(old)
+            b.Add(fp)
+            if ref in contact_at:
+                cc = contact_at[ref]
+                fp.SetPosition(P(W - cc["x"], cc["y_pin_outer"]))
+                fp.Flip(fp.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
+                fp.SetOrientationDegrees(180 if cc["end"] == "top" else 0)
+                moved.append(fp)
+            elif old is not None:
+                fp.SetPosition(pos)
+                if bottom:
+                    fp.Flip(pos, pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
+                fp.SetOrientationDegrees(rot)
+            if ref.startswith(("TP", "H")):
+                fp.SetExcludedFromBOM(True); fp.SetExcludedFromPosFiles(True)
+            if old is None:
+                moved.append(fp)
+        fp = b.FindFootprintByReference(ref)
+        fp.SetValue(c["value"])
+        v = c["fields"].get("LCSC") or c["props"].get("LCSC")
+        if v:
+            fp.SetField("LCSC", v)
+            fp.GetField("LCSC").SetVisible(False); fp.GetField("LCSC").SetLayer(pcbnew.F_Fab)
+    for ref, (x, y, rot) in list(BOOST.items()) + [("F1", FIXED["F1"])] + list(UPDATE_PLACE.items()):
+        fp = b.FindFootprintByReference(ref)
+        fp.SetPosition(P(x, y)); fp.SetOrientationDegrees(rot)
+        moved.append(fp)
+    pin_net = {(r, n): name for name, nodes in nets.items() for r, n in nodes}
+    for f in b.GetFootprints():
+        for p in f.Pads():
+            name = pin_net.get((f.GetReference(), p.GetNumber()))
+            if name:
+                p.SetNet(b.FindNet(name))
+            elif p.GetNumber():
+                p.SetNetCode(0)
+    set_netclasses(b)
+    # rule areas under the feet, new
+    for z in list(b.Zones()):
+        if z.GetIsRuleArea() and z.GetZoneName().startswith("foot "):
+            b.Delete(z)
+    add_foot_keepouts(b)
+    feet = []
+    for _, pts in foot_outlines(b):
+        sp = pcbnew.SHAPE_LINE_CHAIN()
+        for x, y in pts:
+            sp.Append(int(x), int(y))
+        sp.SetClosed(True)
+        feet.append(sp)
+    ripc = {b.FindNet(n).GetNetCode() for n in rip_nets if b.FindNet(n)}
+    if rip_all:
+        ripc = {c for c in b.GetNetsByNetcode().keys() if c != b.FindNet("GND").GetNetCode()}
+    pads = [p for f in moved for p in f.Pads()]
+    boxes = []
+    for f in moved:
+        for lay in (pcbnew.F_CrtYd, pcbnew.B_CrtYd):
+            c = f.GetCourtyard(lay)
+            if c.OutlineCount():
+                boxes.append((pcbnew.F_Cu if lay == pcbnew.F_CrtYd else pcbnew.B_Cu, c))
+    removed = 0
+    for t in list(b.GetTracks()):
+        rip = t.GetNetCode() in ripc or t.GetNetCode() == 0
+        if not rip and (isinstance(t, pcbnew.PCB_VIA) or t.IsOnLayer(pcbnew.B_Cu)):
+            sh = t.GetEffectiveShape(pcbnew.B_Cu)
+            rip = any(sh.Collide(f, MM(0.01)) for f in feet)
+        if not rip:
+            for lay, c in boxes:
+                if t.IsOnLayer(lay) and t.GetEffectiveShape(lay).Collide(c.Outline(0), 0):
+                    rip = True
+                    break
+                q = t.GetPosition() if isinstance(t, pcbnew.PCB_VIA) else t.GetStart()
+                if t.IsOnLayer(lay) and c.Contains(q):
+                    rip = True
+                    break
+        if not rip:
+            for p in pads:
+                lays = [l for l in (pcbnew.F_Cu, pcbnew.B_Cu) if p.IsOnLayer(l) and t.IsOnLayer(l)]
+                if any(p.GetEffectiveShape(l).Collide(t.GetEffectiveShape(l), MM(clr)) for l in lays):
+                    rip = True
+                    break
+        if rip:
+            b.Delete(t)
+            removed += 1
+    removed += remove_stubs(b)
+    print("tracks and vias removed:", removed)
+    add_boost_tracks(b)
+    pcbnew.ZONE_FILLER(b).Fill(b.Zones())
+    b.BuildConnectivity()
+    pcbnew.SaveBoard(path, b)
+    if route:
+        route_rest(b, path)
+
+
 
 if __name__ == "__main__":
     if "--move-contacts" in sys.argv:
@@ -869,6 +1168,9 @@ if __name__ == "__main__":
     elif "--reroute" in sys.argv:  # --reroute NET,NET,...: rip up these nets and route them again, the rest locked
         move_contacts(os.path.join(PCBDIR, NAME + ".kicad_pcb"), rip_nets=sys.argv[sys.argv.index("--reroute") + 1]
                       .split(","), move=False)
+    elif "--update" in sys.argv:  # after a schematic or generator change: update and route only what changed
+        update_board(os.path.join(PCBDIR, NAME + ".kicad_pcb"), route="--no-route" not in sys.argv,
+                     rip_all="--rip-all" in sys.argv)
     elif "--islands" in sys.argv:
         fix_islands(os.path.join(PCBDIR, NAME + ".kicad_pcb"))
     elif "--stitch" in sys.argv:

@@ -116,10 +116,22 @@ def main():
                               box=(T(bb.GetLeft()), T(bb.GetTop()), T(bb.GetRight()), T(bb.GetBottom())),
                               drill=T(max(p.GetDrillSize().x, p.GetDrillSize().y)) / 2, obj=p,
                               pos=(T(p.GetPosition().x), T(p.GetPosition().y))))
-    ctx = dict(b=b, gnd=gnd, items=items, removed=[])
+    # rule areas (e.g. the B.Cu areas under the contacts' feet): no via in them, no track on their layer
+    keepouts = [(z, [i for i, L in enumerate(layers) if z.IsOnLayer(L)]) for z in b.Zones() if z.GetIsRuleArea()]
+    ctx = dict(b=b, gnd=gnd, items=items, removed=[], keepouts=keepouts)
     r = VIA_D / 2
 
+    def in_keepout(x, y, li=None, grow=VIA_D / 2 + 0.05):
+        pt = pcbnew.VECTOR2I(MM(x), MM(y))
+        for z, lis in keepouts:
+            if (li is None or li in lis) and (z.Outline().Contains(pt) or z.Outline().Collide(pt, MM(grow))):
+                if (li is None and z.GetDoNotAllowVias()) or (li is not None and z.GetDoNotAllowTracks()):
+                    return True
+        return False
+
     def clear(x, y):
+        if in_keepout(x, y):
+            return False
         for it in items:
             if it["net"] == g or it.get("gone"):
                 continue
@@ -239,6 +251,20 @@ class Grid:
             hole_o = np.minimum(hole_o, np.hypot(X - hx, self.Y - hy) - hr)
         free = [(gp >= NET_CLR + w / 2) & (hole_o >= HOLE_CLR + w / 2) for gp in gap]
         via_ok = (gap[0] >= NET_CLR + VIA_D / 2) & (gap[1] >= NET_CLR + VIA_D / 2) & (hole_a >= DRILL / 2 + H2H)
+        for z, lis in ctx.get("keepouts", ()):
+            bb = z.GetBoundingBox()
+            m = VIA_D / 2 + 0.05
+            near = ((X >= T(bb.GetLeft()) - m) & (X <= T(bb.GetRight()) + m)
+                    & (self.Y >= T(bb.GetTop()) - m) & (self.Y <= T(bb.GetBottom()) + m))
+            for i, j in zip(*np.nonzero(near)):
+                pt = pcbnew.VECTOR2I(MM(float(self.xs[j])), MM(float(self.ys[i])))
+                o = z.Outline()
+                if o.Contains(pt) or o.Collide(pt, MM(w / 2 + 0.05)):
+                    if z.GetDoNotAllowTracks():
+                        for li in lis:
+                            free[li][i, j] = False
+                if z.GetDoNotAllowVias() and (o.Contains(pt) or o.Collide(pt, MM(m))):
+                    via_ok[i, j] = False
         return free, via_ok
 
     def search(self, free, via_ok, src, is_dst):
