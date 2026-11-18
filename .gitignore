@@ -7,3 +7,4 @@ pcb/*.dsn
 pcb/*.ses
 *.rpt
 pcb/~*.lck
+correspondentie/
